@@ -1,0 +1,28 @@
+---
+title: FreeRADIUS
+description: Memakai FreeRADIUS sebagai pengganti, atau bersama, akun RouterOS langsung.
+section: using
+order: 3
+---
+Selain membuat akun langsung di router Mikrotik, PHPNuxBill dapat mengendalikan FreeRADIUS. Pilih jenis perangkat pada setiap paket.
+
+## Persyaratan
+
+FreeRADIUS memerlukan **VPS atau server dedicated**. FreeRADIUS adalah layanan sistem yang Anda pasang dan jalankan sebagai root, dan harus dapat dijangkau dari router Anda, sehingga shared hosting dan sebagian besar paket control panel tidak dapat menjalankannya. Jika hanya punya shared hosting, gunakan jenis perangkat Mikrotik.
+
+| Perangkat | Fungsinya |
+|---|---|
+| `Radius` | RADIUS dengan MySQL/MariaDB sebagai database. |
+| `RadiusRest` | Menangani koneksi RADIUS melalui REST API. |
+| `RadiusALE` | Sama, untuk perangkat Alcatel-Lucent Enterprise. |
+| `RadiusChillispot` | Voucher hotspot dengan ChilliSpot di OpenWrt dan RADIUS MySQL. |
+
+## Endpoint REST
+
+`radius.php` di root situs adalah endpoint `rlm_rest` FreeRADIUS. Ia menjawab permintaan `authorize`, `authenticate`, dan `accounting`, dan membedakannya lewat header `X-FreeRADIUS-Section`.
+
+## Koneksi database
+
+Saat dukungan RADIUS aktif, aplikasi membuka koneksi database kedua bernama `radius` untuk tabel RADIUS (`rad_acct` dan tabel terkait, didefinisikan di `install/radius.sql`).
+
+Lihat [halaman wiki FreeRADIUS](https://github.com/hotspotbilling/phpnuxbill/wiki/FreeRadius) untuk sisi server FreeRADIUS.

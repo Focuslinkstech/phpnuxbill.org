@@ -1,0 +1,30 @@
+---
+title: FreeRADIUS
+description: Doğrudan RouterOS hesapları yerine veya onlarla birlikte FreeRADIUS kullanımı.
+section: using
+order: 3
+---
+PHPNuxBill, hesapları doğrudan bir Mikrotik router üzerinde oluşturmanın yanı sıra FreeRADIUS'u da yönetebilir. Cihaz türünü her pakette seçersiniz.
+
+## Gereksinimler
+
+FreeRADIUS için bir **VPS veya ayrılmış sunucu** gerekir. Root olarak kurup çalıştırdığınız bir sistem hizmetidir ve router'larınızdan erişilebilir olmalıdır; bu yüzden paylaşımlı barındırma ve çoğu kontrol paneli paketi onu çalıştıramaz. Yalnızca paylaşımlı barındırmanız varsa Mikrotik cihaz türlerini kullanın.
+
+| Cihaz | Ne yapar |
+|---|---|
+| `Radius` | Veritabanı olarak MySQL/MariaDB kullanan RADIUS. |
+| `RadiusRest` | RADIUS bağlantısını bir REST API üzerinden yönetir. |
+| `RadiusALE` | Aynısı, Alcatel-Lucent Enterprise cihazları için. |
+| `RadiusChillispot` | OpenWrt üzerinde ChilliSpot ve RADIUS MySQL ile hotspot voucher'ları. |
+
+## REST uç noktası
+
+Site kökündeki `radius.php`, FreeRADIUS `rlm_rest` uç noktasıdır. `authorize`, `authenticate` ve `accounting`
+isteklerini yanıtlar ve bunları `X-FreeRADIUS-Section` başlığına göre ayırt eder.
+
+## Veritabanı bağlantısı
+
+RADIUS desteği açıkken uygulama, RADIUS tabloları için (`rad_acct` ve ilgili tablolar, `install/radius.sql` içinde tanımlıdır)
+`radius` adlı ikinci bir veritabanı bağlantısı açar.
+
+FreeRADIUS sunucu tarafı için [FreeRADIUS wiki sayfasına](https://github.com/hotspotbilling/phpnuxbill/wiki/FreeRadius) bakın.

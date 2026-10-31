@@ -1,0 +1,77 @@
+---
+title: Kurulum
+description: "Gereksinimler, web yükleyicisi ve paketlerin zamanında bitmesini sağlayan cron görevi."
+section: getting-started
+order: 3
+---
+## Gereksinimler
+
+| Gerekli | Notlar |
+|---|---|
+| PHP 8.2 veya üzeri | PDO ve MySQLi uzantılarıyla |
+| MySQL | Yükleyicinin içe aktardığı veritabanı |
+| GD2, cURL, ZIP, mbstring | PHP uzantıları |
+| Bir web sunucusu | `mod_rewrite` etkin Apache veya bilinmeyen yolları `index.php`'ye yönlendiren herhangi bir sunucu |
+
+Linux önerilir. Windows'ta da çalışır, ancak orada cron görevini zamanlamak daha zordur.
+
+Raspberry Pi üzerinde de çalışır.
+
+### Üretim ortamı için
+
+| | Önerilen | Daha yüksek performans |
+|---|---|---|
+| Sunucu | VPS veya ayrılmış sunucu | VPS veya ayrılmış sunucu |
+| CPU | 1 GHz veya daha hızlı | Dört çekirdek, 3 GHz veya daha hızlı |
+| RAM | 1 GB veya üzeri | 6 GB veya üzeri |
+| Disk | 10 GB veya üzeri | 200 GB veya üzeri |
+| Ağ | 50 Mbps veya üzeri | 100 Mbps veya üzeri, tercihen 1 Gbps |
+
+Her ikisi için de Linux, PHP 8.2 veya üzeri, MariaDB 10 veya üzeri, `mod_rewrite` etkin Apache 2.4 ya da Nginx, bir SSL sertifikası (Let's Encrypt ücretsizdir) ve şu PHP uzantıları gerekir: bcmath, curl, gd, intl, mbstring, mysqli, pdo, tokenizer, xml ve zip.
+
+FreeRADIUS isteğe bağlıdır ve kendi VPS'ine ya da ayrılmış sunucusuna ihtiyaç duyar.
+
+## Kurulum yöntemini seçin
+
+- [cPanel ile paylaşımlı barındırma](/tr/docs/getting-started/install-cpanel/)
+- [Kendi VPS'iniz](/tr/docs/getting-started/install-vps/)
+- [Bilgisayarınız](/tr/docs/getting-started/install-local/)
+
+## Kurulum
+
+1. **Dosyaları yükleyin.** Deponun kök dizini web kök dizinidir. `public/` klasörü yoktur.
+2. **Boş bir veritabanı** ve onun için bir kullanıcı oluşturun.
+3. Tarayıcınızda **`/install` adresini açın**. Yükleyici `config.php` dosyasını yazar ve `install/phpnuxbill.sql` dosyasını içe aktarır.
+4. Oluşturduğunuz hesapla **oturum açın** ve router'ınızı *Network* altından ekleyin.
+
+> `config.php`, veritabanı kimlik bilgilerini ve `APP_URL` değerini tutar. Deponun parçası değildir; şablon olarak `config.sample.php` kullanılır.
+
+## Cron
+
+Paketlerin süresinin sona erdirilmesi, paketlerin yenilenmesi ve hatırlatmaların gönderilmesi bir cron görevi tarafından yapılır. Bu görev olmadan müşteriler paketleri bittikten sonra da çevrimiçi kalır.
+
+```bash
+# every minute: expire and renew customers
+* * * * * cd /path/to/site/system && php cron.php
+
+# every day: send reminders
+0 8 * * * cd /path/to/site/system && php cron_reminder.php
+```
+
+Aynı şekilde ekleyebileceğiniz diğer görevler:
+
+```bash
+php system/cron/clean_expired_vouchers.php
+php system/cron/cleanup_stale_sessions.php
+php system/cron/marketplace_sync.php
+```
+
+Cron görevi 24 saattir çalışmadıysa gösterge paneli sizi uyarır.
+
+## Güncelleme
+
+Daha yeni bir sürümü yükledikten sonra `/update.php` adresini açın. Yeni şema ifadelerini `system/updates.json` dosyasından yeniden çalıştırır ve `version.json` dosyasını yazar. Önce veritabanı yedeği alın.
+
+## Yerel geliştirme
+
+Yerel bir PHP sunucusunu veya bir XAMPP sanal ana bilgisayarını deponun kök dizinine yönlendirin. `config.php` içindeki `$_app_stage` değeri `Live` olmadığında hatalar gösterilir ve sorgular kaydedilir. Bu, geliştirme makinesinde istediğiniz, üretimde ise istemediğiniz bir davranıştır.

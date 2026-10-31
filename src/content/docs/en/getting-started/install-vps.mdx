@@ -1,0 +1,61 @@
+---
+title: Install on a VPS
+description: Install PHPNuxBill on your own Linux server with Apache or Nginx.
+section: getting-started
+order: 5
+---
+## 1. Prepare the server
+
+- Use a supported Linux system such as Ubuntu or Debian, and update its packages.
+- Install a web server (Apache or Nginx), PHP 8.2 or newer, and MySQL or MariaDB.
+- Install the PHP extensions listed under [Requirements](/docs/getting-started/installation/#requirements).
+- Set up a firewall.
+- Get an SSL certificate. Let's Encrypt is free.
+
+## 2. Download PHPNuxBill
+
+```bash
+cd /var/www/html
+
+# with git
+git clone https://github.com/hotspotbilling/phpnuxbill-ultimate.git .
+
+# or download a release and unpack it
+wget https://github.com/hotspotbilling/phpnuxbill-ultimate/archive/refs/heads/main.zip
+unzip main.zip
+```
+
+## 3. Create the database
+
+```sql
+CREATE DATABASE phpnuxbill;
+CREATE USER 'phpnuxbilluser'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON phpnuxbill.* TO 'phpnuxbilluser'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Run it after `mysql -u root -p`.
+
+## 4. Configure the web server
+
+- **Apache:** create a virtual host that points at the PHPNuxBill folder and enable `mod_rewrite`. The `.htaccess` in the root does the routing.
+- **Nginx:** create a server block with the same root and PHP handling, and send every path that is not a file to `index.php?_route=$1`.
+
+## 5. Set permissions
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+```
+
+`system/uploads/`, `system/cache/`, `ui/compiled/`, `ui/cache/` and `system/lan/` must stay writable by the web server.
+
+## 6. Run the installer
+
+Open your site in the browser and follow the installer. Enter the database details from step 3.
+
+## 7. Finish
+
+- Sign in to the admin panel and delete the `install` folder.
+- Add the cron jobs from [Installation](/docs/getting-started/installation/#cron).
+- Set up your payment gateways, email and other settings in the admin panel.

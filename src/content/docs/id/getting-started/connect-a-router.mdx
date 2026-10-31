@@ -1,0 +1,68 @@
+---
+title: Hubungkan router
+description: Tambahkan router Mikrotik Anda, buat paket, dan uji dengan voucher.
+section: getting-started
+order: 7
+---
+Panduan ini menunjukkan jalur tercepat dari instalasi baru ke penjualan yang berjalan: tambahkan router Mikrotik, buat paket, lalu beli dengan voucher sebagai pelanggan uji. Diasumsikan Anda sudah menyelesaikan [instalasi](/id/docs/getting-started/installation/) dan bisa masuk sebagai administrator.
+
+## 1. Siapkan router
+
+PHPNuxBill berkomunikasi dengan router Mikrotik melalui RouterOS API.
+
+- **Aktifkan layanan API.** Di WinBox, buka *IP > Services* dan pastikan `api` aktif. Port bawaannya `8728`.
+- **Buat pengguna untuk PHPNuxBill** di router. Pengguna khusus lebih baik daripada `admin`. Hak penuh adalah yang paling sederhana untuk memulai, dan Anda bisa membatasinya nanti setelah tahu apa yang dibutuhkan pengaturan Anda.
+- **Pastikan server bisa menjangkau router** pada port itu. Jika PHPNuxBill berjalan di host jarak jauh, biasanya Anda memerlukan aturan firewall atau VPN agar port API terjangkau dari server, bukan dari semua orang.
+
+## 2. Tambahkan router
+
+Buka *Network > Routers* lalu tambahkan satu:
+
+| Kolom | Isi |
+|---|---|
+| Status | Enable |
+| Router Name / Location | Nama yang mudah Anda kenali, misalnya lokasi yang dilayani |
+| IP Address | Alamat router, beserta port jika bukan bawaan: `192.168.88.1` atau `192.168.88.1:8728` |
+| Username | Pengguna RouterOS yang Anda buat |
+| Router Secret | Kata sandi pengguna itu |
+| Description | Opsional, misalnya area yang dicakup |
+
+Biarkan *Test Connection* tercentang lalu simpan. Jika pengujian gagal, pesannya menjelaskan sebabnya. Penyebab yang umum adalah layanan API mati, port salah, kata sandi salah, atau firewall di antaranya.
+
+## 3. Buat profil bandwidth
+
+Buka *Internet Plan > Bandwidth* lalu tambahkan profil: nama dan kecepatan unduh serta unggah. Paket memilih salah satunya, sehingga kecepatan yang sama bisa dipakai di beberapa paket.
+
+## 4. Buat paket
+
+Buka *Internet Plan > Hotspot* (atau *PPPOE*) lalu tambahkan paket:
+
+- **Active** dan **Prepaid**, dengan **Personal** atau **Business** sebagai jenis paket.
+- **Plan Name** yang akan dilihat pelanggan.
+- **Unlimited**, atau **Limited** berdasarkan waktu, data, atau keduanya.
+- Profil **Bandwidth** dari langkah sebelumnya.
+- **Package Price**, dan berapa lama paket berlaku (**Validity**).
+- **Router** yang sudah Anda tambahkan.
+
+Simpan. Paket dibuat di router untuk Anda.
+
+## 5. Uji dengan voucher
+
+1. Buka *Services > Vouchers* dan tambahkan satu voucher untuk paket baru. Halaman [Voucher](/id/docs/using/vouchers/) menjelaskan formulirnya.
+2. Buka portal pelanggan, daftarkan pelanggan uji, lalu masukkan kodenya di *Voucher Activation*.
+3. Akun dibuat di router. Hubungkan perangkat ke hotspot lalu masuk untuk memastikan semuanya berfungsi.
+
+## 6. Atur cron job
+
+Paket hanya berakhir tepat waktu jika [cron job](/id/docs/getting-started/installation/) berjalan. Lakukan sekarang, sebelum pelanggan sungguhan datang.
+
+## Jika ada yang salah
+
+| Yang Anda lihat | Periksa |
+|---|---|
+| *Test Connection* gagal | Layanan API aktif, port benar dan terjangkau dari server, serta username dan kata sandi benar. |
+| Pelanggan membeli paket tetapi tidak online | Paket memakai router yang Anda harapkan, koneksi ke router masih berfungsi, dan *Logs* tidak menampilkan galat untuk pelanggan itu. |
+| Paket tidak berakhir | Cron job berjalan. Dasbor memperingatkan Anda bila belum berjalan selama 24 jam. |
+| Halaman menampilkan galat kosong | Di mesin uji, ubah `$_app_stage` di `config.php` menjadi selain `Live` untuk melihat galat sebenarnya. |
+
+Masih buntu? Lihat [Mendapatkan bantuan](/id/docs/getting-started/getting-help/).

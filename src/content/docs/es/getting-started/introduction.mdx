@@ -1,0 +1,36 @@
+---
+title: Introducción
+description: Qué es PHPNuxBill, para quién es y cómo encajan sus piezas.
+section: getting-started
+order: 1
+---
+PHPNuxBill es un sistema de facturación para ISP y operadores de hotspot que usan routers Mikrotik. El cliente compra un plan, el sistema crea su cuenta en el router (o en FreeRADIUS) y la elimina cuando el plan termina.
+
+## Qué incluye
+
+- **Planes Hotspot y PPPoE** en uno o varios routers Mikrotik, o mediante FreeRADIUS.
+- **Vouchers**: genera e imprime lotes, o véndelos desde el portal del cliente.
+- **Un portal del cliente** para registro, recarga de saldo, compra de paquetes e historial.
+- **Pasarelas de pago**, **dispositivos**, **plugins** y **temas** que se instalan desde el Marketplace integrado.
+- **Roles de personal** con su propio menú: `SuperAdmin`, `Admin`, `Report`, `Agent`, `Sales`, `Asset` y `Support`.
+
+## Cómo está construido
+
+Es PHP sencillo con una base de datos MySQL y sin framework. La raíz del repositorio es la raíz web, no hay paso de compilación y las páginas se generan con plantillas Smarty. Eso lo hace fácil de alojar en un servidor compartido o en una Raspberry Pi, y fácil de leer cuando necesitas cambiar algo.
+
+| Pieza | Dónde |
+|---|---|
+| Páginas (controladores) | `system/controllers/` |
+| Plantillas | `ui/ui/` (los temas las reemplazan desde `ui/themes/`) |
+| Plugins | `system/plugin/` |
+| Pasarelas de pago | `system/paymentgateway/` |
+| Controladores de dispositivo | `system/devices/` |
+| Esquema y migraciones | `install/phpnuxbill.sql` y `system/updates.json` |
+
+## Siguientes pasos
+
+1. [Instálalo](/es/docs/getting-started/installation/) y configura el cron.
+2. Aprende cómo funcionan los [vouchers](/es/docs/using/vouchers/) y los [roles](/es/docs/using/roles/).
+3. Si escribes código, empieza por la [guía de plugins](/es/docs/extending/plugins/) (en inglés).
+
+PHPNuxBill es software libre bajo la Licencia Pública General de GNU, versión 2 o posterior.

@@ -1,0 +1,34 @@
+---
+title: Bilgisayarınıza kurulum
+description: PHPNuxBill'i denemek veya geliştirmek için macOS ya da Windows üzerinde yerel olarak çalıştırın.
+section: getting-started
+order: 6
+---
+Yerel kurulum, diğer kurulumlarla aynı adımları izler. Değişen tek şey PHP ve MySQL'i nasıl edineceğinizdir.
+
+## macOS
+
+1. [Homebrew](https://brew.sh/) kurun.
+2. PHP ve bir veritabanı kurun:
+
+   ```bash
+   brew install php composer
+   brew install mariadb   # or: brew install mysql
+   ```
+
+3. PHPNuxBill klasöründen PHP'nin yerleşik sunucusunu başlatın:
+
+   ```bash
+   php -S localhost:8000
+   ```
+
+   Yerleşik sunucu `.htaccess` dosyasını okumaz; bu yüzden düzgün URL'ler için Apache veya Nginx kurulumu gerekir. `/index.php?_route=...` adresini açmak ise bunlar olmadan çalışır.
+
+## Windows
+
+1. [XAMPP](https://www.apachefriends.org/index.html) veya [Laragon](https://laragon.org/) kurun.
+2. Kontrol panelinden Apache ve MySQL'i başlatın.
+3. PHPNuxBill dosyalarını `htdocs` (XAMPP) veya `www` (Laragon) klasörüne koyun.
+4. `http://localhost/your-folder` adresini açın ve yükleyiciyi çalıştırın.
+
+Windows'ta cron görevlerini zamanlamak daha zordur. Task Scheduler kullanın; denemenin ötesindeki işler için bir Linux makine tercih edin.

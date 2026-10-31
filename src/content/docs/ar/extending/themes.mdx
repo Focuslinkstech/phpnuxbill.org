@@ -1,0 +1,29 @@
+---
+title: القوالب
+description: أعد تصميم لوحة الإدارة وبوابة العميل بتجاوز القوالب وبضعة رموز ألوان.
+section: extending
+order: 13
+---
+القالب (theme) مجلد في `ui/themes/<slug>/` يضم `theme.json`. يتجاوز القوالب حسب المسار: الملف `ui/themes/<slug>/admin/customers/list.tpl` يحلّ محل `ui/ui/admin/customers/list.tpl`. وما لا يتجاوزه يعود إلى القالب الأب (`"parent"` في `theme.json`) ثم إلى القالب الافتراضي.
+
+## إضافات اختيارية
+
+- **`functions.php`** يعمل في كل طلب ما دام القالب مفعّلًا، مثلًا لإضافة ورقة أنماط أو دوال Smarty مساعدة. يجب ألا يطبع شيئًا ولا يستدعي `exit`، وأي خطأ PHP فيه يمنع التفعيل.
+- **`styles/customer.css`** يعيد تصميم رأس بوابة العميل وقائمتها وشريطها على الجوال وتذييلها بإعادة تعريف رموز الألوان `--cm-*`، دون نسخ أي قالب.
+- **الوضع الداكن** هو الصنف `dark-mode` على `<body>`. صمّم للوضعين.
+
+```css
+/* styles/customer.css */
+body.cm-chrome.modern-skin-dark {
+  --cm-accent: #18181b;
+  --cm-border: #e4e4e7;
+}
+```
+
+## ترتيب البحث عن القوالب
+
+1. `ui/ui_custom/`
+2. `ui/themes/<your theme>/`
+3. `ui/ui/`
+
+لا يوجد قالب من ملف واحد؛ القالب دائمًا مجلد.

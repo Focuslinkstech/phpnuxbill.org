@@ -1,0 +1,33 @@
+---
+title: Personel rolleri
+description: Her personel rolünün neleri görebildiği ve bir sayfanın bazı rollerle nasıl sınırlandırılacağı.
+section: using
+order: 2
+---
+Her personel hesabının bir rolü vardır. Rol, hangi menü girişlerinin görüneceğini ve hangi sayfaların açılacağını belirler.
+
+| Rol | Tipik kullanım |
+|---|---|
+| `SuperAdmin` | Sahip. Sistem ayarları dahil tam erişim. |
+| `Admin` | Müşterilerin, paketlerin ve router'ların günlük yönetimi. |
+| `Report` | Raporlara salt okunur erişim. |
+| `Agent` | Kendi müşterilerine satış yapan bayi. |
+| `Sales` | Ön büro satışı. |
+| `Asset` | Ekipman ve envanter. |
+| `Support` | Müşteri desteği. |
+
+## Role göre gösterge paneli
+
+Gösterge paneli düzeni rol başına saklanır; bu yüzden bir `Support` kullanıcısı, bir `Admin` kullanıcısından farklı widget'lar görebilir.
+
+## Kodda bir sayfayı korumak
+
+Controller'lar ve eklentiler rolü satır içinde kontrol eder:
+
+```php
+if (!in_array($admin['user_type'], ['SuperAdmin', 'Admin'])) {
+    _alert(Lang::T('You do not have permission to access this page'), 'danger', 'dashboard');
+}
+```
+
+Eklentilerin eklediği menü girişleri aynı listeyi `auth` argümanında alır. Boş liste herkes anlamına gelir.

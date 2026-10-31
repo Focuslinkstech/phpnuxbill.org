@@ -1,0 +1,25 @@
+---
+title: Cara kerja
+description: Voucher, template login, dan bagaimana pelanggan dari halaman login Mikrotik sampai bisa online.
+section: getting-started
+order: 2
+---
+PHPNuxBill awalnya dibuat untuk menjual voucher. Anda membuat voucher di PHPNuxBill lalu menjualnya ke pelanggan. Voucher tidak pernah masuk ke Mikrotik. Sebagai gantinya, template login di router mengarahkan pelanggan ke PHPNuxBill untuk mendaftar. Pelanggan membeli voucher, mendaftar, lalu mengaktifkannya di PHPNuxBill. PHPNuxBill kemudian menambahkan pelanggan ke Mikrotik, dan pelanggan masuk lewat halaman login router dengan akun PHPNuxBill mereka.
+
+Payment gateway dan pendaftaran yang mudah mengubah hal ini. Voucher kini hanya salah satu pilihan: pelanggan bisa membeli paket langsung lewat payment gateway di PHPNuxBill.
+
+## Voucher
+
+![Voucher yang sudah dicetak](/img/voucher.jpg)
+
+## Template login
+
+[Template login Mikrotik](https://github.com/hotspotbilling/phpnuxbill-mikrotik-login-template) mengarahkan pelanggan dari halaman login router ke PHPNuxBill.
+
+## Topologi
+
+![Hubungan router, PHPNuxBill, dan pelanggan](/img/topology.jpg)
+
+## Diagram alur
+
+![Dari halaman login sampai online](/img/flow-chart.jpg)

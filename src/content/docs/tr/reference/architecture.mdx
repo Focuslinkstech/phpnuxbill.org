@@ -1,0 +1,38 @@
+---
+title: Mimari
+description: Bir isteğin uygulama içinde nasıl ilerlediği ve kodun izlediği kurallar.
+section: reference
+order: 1
+---
+## İstek yaşam döngüsü
+
+```
+index.php  →  system/vendor/autoload.php
+           →  system/boot.php
+                 →  init.php   (autoloader, config.php, database, plugins, settings)
+                 →  Smarty as $ui, template folders
+                 →  $routes = explode('/', $_GET['_route'])
+                 →  system/controllers/{$routes[0]}.php
+```
+
+Yeniden yazma kuralı, dosya olmayan her yolu `index.php?_route=$1` adresine gönderir; dolayısıyla `/customers/edit/5` ile `?_route=customers/edit/5` aynı istektir. `$routes[1]` eylem, `$routes[2]` ise kimliktir (id).
+
+`system/api.php` ikinci bir giriş noktasıdır. Aynı controller'ları çalıştırır ama atanan değişkenleri JSON olarak döndürür; controller'ların çıktıyı doğrudan yazdırmak yerine `$ui->assign()`, `r2()` ve `showResult()` kullanmasının nedeni budur.
+
+## Kurallar
+
+| Konu | Kural |
+|---|---|
+| Sınıflar | Namespace yok. `Foo`, `system/autoload/Foo.php` dosyasından yüklenir. |
+| Veritabanı | Idiorm: `ORM::for_table('tbl_customers')->where(...)->find_one()`. |
+| Şema değişiklikleri | Bunları `install/phpnuxbill.sql` dosyasına ve `system/updates.json` içine yeni bir sürüm anahtarı olarak ekleyin. |
+| Kimlik doğrulama | Personel sayfaları için `_admin()`, müşteri sayfaları için `_auth()`. |
+| Girdi | `_post()`, `_get()`, `_req()` yalnızca baştaki ve sondaki boşlukları keser. Kaçış (escape) işlemi yapmazlar. |
+| CSRF | `Csrf::generateAndStoreToken()` ile üretin, veriyi değiştirmeden önce `Csrf::check()` ile denetleyin. |
+| Yönlendirmeler | `r2(getUrl('path'), 's' or 'e' or 'w', Lang::T('Message'))`. |
+| Çeviri | `system/lan/*.json` dosyalarına dayanan `Lang::T('English string')`. |
+| Günlükleme | `_log($description, $type, $userid)`, `tbl_logs` tablosuna yazar. |
+
+## Uzantı noktaları
+
+Eklentiler menüleri, route'ları ve hook'ları kaydeder (`register_menu()`, `register_route()`, `register_hook()`). Controller'lar, bir eklentinin sayfaya ekleme yapabileceği yerlerde `run_hook('name')` çağırır. Ödeme geçitleri, cihazlar ve widget'lar kendi klasörlerinden ada göre yüklenir. [Uzantı türleri](/tr/docs/extending/overview/) sayfasına bakın.

@@ -1,0 +1,39 @@
+---
+title: Cihaz sürücüleri
+description: Bir router'da veya başka bir cihazda müşteri hesaplarını oluşturan ve silen tek bir sınıf.
+section: extending
+order: 12
+---
+Sürücü tek bir sınıftır. Faturalama motoru onu yapıcı argümanı olmadan oluşturur (`new $plan['device']`), bu yüzden sınıf adı
+dosya veya klasör adıyla aynı olmalıdır. Bir paket sürücüsünü paket formunda seçer.
+
+| Metot | Ne zaman çağrılır |
+|---|---|
+| `description()` | Cihaz listesinin bir başlığa, yazara ve bağlantılara ihtiyacı olduğunda. |
+| `add_customer($customer, $plan)` / `remove_customer($customer, $plan)` | Bir müşteri etkinleştirildiğinde veya süresi dolduğunda. |
+| `change_username($plan, $from, $to)` | Bir kullanıcı adı değiştiğinde. |
+| `add_plan($plan)` / `update_plan($old_name, $plan)` / `remove_plan($plan)` | Bir paket oluşturulduğunda, düzenlendiğinde veya silindiğinde. |
+| `connect_customer(...)` / `online_customer(...)` / `disconnect_customer(...)` | Hotspot girişi, durumu ve çıkışı. |
+| `sync_customer($customer, $plan)` | İsteğe bağlı. Etkin bir müşteriyi cihaza yeniden gönderir. |
+
+Kullanılmayan metotları silmek yerine boş bırakın.
+
+```php
+class AcmeRouter
+{
+    public function description()
+    {
+        return ['title' => 'Acme Router', 'description' => 'Drives Acme routers.', 'author' => 'You'];
+    }
+
+    public function add_customer($customer, $plan)
+    {
+        $device = ORM::for_table('tbl_routers')->where('name', $plan['routers'])->find_one();
+        // call the device with $customer['username'], $customer['password'], $plan['name_plan']
+    }
+}
+```
+
+Çekirdek sürücüler (`MikrotikHotspot`, `MikrotikPppoe`, `MikrotikStatic`, `MikrotikVpn`, `Radius`, `RadiusALE`, `RadiusChillispot`,
+`RadiusRest`, `Voucher`, `Dummy`) yükleme ile değiştirilemez ve paketlerin hâlâ kullandığı bir sürücü kaldırılamaz.
+`$_app_stage` değeri `Demo` iken gerçek cihazlara dokunmayın.

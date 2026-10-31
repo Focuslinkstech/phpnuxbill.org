@@ -1,0 +1,33 @@
+---
+title: Temalar
+description: Şablonları ve birkaç renk belirtecini geçersiz kılarak yönetim panelinin ve müşteri portalının görünümünü değiştirin.
+section: extending
+order: 13
+---
+Tema, `ui/themes/<slug>/` içinde `theme.json` bulunan bir klasördür. Şablonları yola göre geçersiz kılar:
+`ui/themes/<slug>/admin/customers/list.tpl` dosyası `ui/ui/admin/customers/list.tpl` dosyasının yerine geçer. Geçersiz kılmadığı her şey
+üst temaya (`theme.json` içindeki `"parent"`), ardından varsayılana döner.
+
+## İsteğe bağlı ekler
+
+- **`functions.php`**, tema etkinken her istekte çalışır; örneğin bir stil dosyası veya Smarty yardımcıları eklemek için kullanılır.
+  Çıktı yazmamalı veya `exit` çağırmamalıdır; içindeki bir PHP hatası etkinleştirmeyi engeller.
+- **`styles/customer.css`**, `--cm-*` renk belirteçlerini yeniden tanımlayarak müşteri portalının üst bilgisini, menüsünü, mobil çubuğunu ve alt bilgisini
+  şablon kopyalamadan yeniden biçimlendirir.
+- **Koyu mod**, `<body>` üzerindeki `dark-mode` sınıfıdır. Her iki modu da biçimlendirin.
+
+```css
+/* styles/customer.css */
+body.cm-chrome.modern-skin-dark {
+  --cm-accent: #18181b;
+  --cm-border: #e4e4e7;
+}
+```
+
+## Şablon arama sırası
+
+1. `ui/ui_custom/`
+2. `ui/themes/<your theme>/`
+3. `ui/ui/`
+
+Tek dosyalı tema yoktur; tema her zaman bir klasördür.

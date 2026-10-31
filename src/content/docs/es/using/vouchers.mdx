@@ -1,0 +1,22 @@
+---
+title: Vouchers
+description: Genera, imprime y vende vouchers de prepago.
+section: using
+order: 1
+---
+Un voucher es un código que activa un plan cuando el cliente lo introduce en el portal. Los generas por lotes en *Services*.
+
+## Generar un lote
+
+Elige Hotspot o PPPoE, el router y el plan; después el nombre del lote, cuántos vouchers crear (hasta 1000 a la vez), el formato del código, un prefijo opcional y la longitud del código. La página muestra una vista previa de los códigos antes de generarlos. Marca *print now* para abrir la vista de impresión justo después de generar.
+
+- **Los códigos son únicos.** La generación comprueba primero los códigos existentes y la base de datos también garantiza la unicidad. Si dos peticiones compiten por el mismo código, la perdedora reintenta con uno nuevo en lugar de hacer fallar todo el lote.
+- **El prefijo y la longitud** los eliges tú, así un lote se distingue de un vistazo.
+
+## Canjear
+
+El cliente abre el portal, introduce el código en *Voucher Activation* y pulsa *Recharge*. El plan empieza en su cuenta como cualquier otra compra.
+
+## Limpieza
+
+`php system/cron/clean_expired_vouchers.php` elimina las cuentas de voucher que vencieron hace más de 30 días. Añádelo al cron si generas lotes grandes. Ejecútalo antes con `--dry-run` para ver qué borraría.

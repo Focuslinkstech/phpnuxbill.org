@@ -1,0 +1,61 @@
+---
+title: التثبيت على VPS
+description: ثبّت PHPNuxBill على خادم Linux خاص بك مع Apache أو Nginx.
+section: getting-started
+order: 5
+---
+## 1. جهّز الخادم
+
+- استخدم نظام Linux مدعومًا مثل Ubuntu أو Debian، وحدّث حزمه.
+- ثبّت خادم ويب (Apache أو Nginx) وPHP 8.2 أو أحدث وMySQL أو MariaDB.
+- ثبّت امتدادات PHP المذكورة في [المتطلبات](/ar/docs/getting-started/installation/#المتطلبات).
+- اضبط جدارًا ناريًا.
+- احصل على شهادة SSL. شهادة Let's Encrypt مجانية.
+
+## 2. نزّل PHPNuxBill
+
+```bash
+cd /var/www/html
+
+# with git
+git clone https://github.com/hotspotbilling/phpnuxbill-ultimate.git .
+
+# or download a release and unpack it
+wget https://github.com/hotspotbilling/phpnuxbill-ultimate/archive/refs/heads/main.zip
+unzip main.zip
+```
+
+## 3. أنشئ قاعدة البيانات
+
+```sql
+CREATE DATABASE phpnuxbill;
+CREATE USER 'phpnuxbilluser'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON phpnuxbill.* TO 'phpnuxbilluser'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+نفّذها بعد `mysql -u root -p`.
+
+## 4. اضبط خادم الويب
+
+- **Apache:** أنشئ مضيفًا افتراضيًا يشير إلى مجلد PHPNuxBill وفعّل `mod_rewrite`. ملف `.htaccess` في الجذر يتولى التوجيه.
+- **Nginx:** أنشئ server block بالجذر نفسه ومعالجة PHP نفسها، ووجّه كل مسار ليس ملفًا إلى `index.php?_route=$1`.
+
+## 5. اضبط الصلاحيات
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+```
+
+يجب أن تبقى المجلدات `system/uploads/` و`system/cache/` و`ui/compiled/` و`ui/cache/` و`system/lan/` قابلة للكتابة من خادم الويب.
+
+## 6. شغّل المثبّت
+
+افتح موقعك في المتصفح واتبع خطوات المثبّت. أدخل بيانات قاعدة البيانات من الخطوة 3.
+
+## 7. أنهِ الإعداد
+
+- سجّل الدخول إلى لوحة الإدارة واحذف مجلد `install`.
+- أضف مهام cron من صفحة [التثبيت](/ar/docs/getting-started/installation/#cron).
+- اضبط بوابات الدفع والبريد وبقية الإعدادات من لوحة الإدارة.

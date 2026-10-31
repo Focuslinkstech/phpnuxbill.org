@@ -1,0 +1,101 @@
+---
+import type { Extension } from '../data/community';
+import { DEFAULT_LANG, ui, type Lang } from '../i18n';
+interface Props { id: string; title: string; intro?: string; items: Extension[]; }
+const { id, title, intro, items } = Astro.props;
+const lang = (Astro.currentLocale ?? DEFAULT_LANG) as Lang;
+const t = ui[lang].slider;
+const shown = items.slice(0, 18);
+---
+<div class="slider" data-slider data-labels={JSON.stringify({ play: t.play, pause: t.pause })}>
+  <div class="flex items-end justify-between gap-4">
+    <div>
+      <h3 class="text-2xl font-semibold tracking-tight">{title}</h3>
+      {intro && <p class="mt-1 max-w-xl text-muted-foreground">{intro}</p>}
+    </div>
+    <div class="flex gap-2">
+      <button type="button" data-toggle aria-pressed="false" aria-label={`${t.pause}: ${title}`} title={t.pause} class="grid h-10 w-10 place-items-center rounded-full border hover:bg-accent">
+        <svg data-icon="pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        <svg data-icon="play" class="hidden" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button type="button" data-dir="-1" aria-label={`${t.back}: ${title}`} class="hidden h-10 w-10 sm:grid place-items-center rounded-full border hover:bg-accent disabled:opacity-40">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
+      </button>
+      <button type="button" data-dir="1" aria-label={`${t.forward}: ${title}`} class="hidden h-10 w-10 sm:grid place-items-center rounded-full border hover:bg-accent disabled:opacity-40">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+  <ul id={id} dir="ltr" tabindex="0" role="region" aria-label={title}
+    class="slider-track relative mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
+    {shown.map((x) => (
+      <li class="w-[17rem] flex-none snap-start sm:w-[19rem]">
+        <article dir="ltr" class="flex h-full flex-col rounded-xl border bg-card p-5">
+          <div class="flex items-start justify-between gap-3">
+            <h4 class="font-display text-lg font-semibold leading-snug">{x.name}</h4>
+            <span class:list={['mt-0.5 flex-none rounded-full px-2.5 py-0.5 text-xs font-medium', x.paid ? 'bg-sun/20 text-foreground' : 'bg-accent text-brand']}>{x.paid ? t.paid : t.free}</span>
+          </div>
+          <p class="mt-3 line-clamp-4 flex-1 text-sm leading-relaxed text-muted-foreground">{x.description}</p>
+          <div class="mt-4 flex items-center justify-between gap-3 border-t pt-3 text-sm">
+            <span class="truncate text-muted-foreground">{t.by} {x.author || t.unknownAuthor}</span>
+            {(x.paid ? (x.url || x.github) : (x.github || x.url)) && <a href={x.paid ? (x.url || x.github) : (x.github || x.url)} rel="noopener" class:list={['flex-none font-medium hover:underline', x.paid ? 'rounded-full bg-sun px-3 py-1 text-foreground no-underline hover:opacity-90' : 'text-brand']}>{x.paid ? t.buy : t.view}<span class="sr-only"> {x.name}</span></a>}
+          </div>
+        </article>
+      </li>
+    ))}
+  </ul>
+</div>
+<script>
+  // Autoplay moves one card at a time every few seconds and wraps back to the start. It stops while the pointer or keyboard focus is
+  // on the list, while the list is off screen or the tab is hidden, after the pause button is pressed, and never starts for people
+  // who ask for reduced motion. Without scripting the list still scrolls by touch, trackpad, or the keyboard once focused.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-slider]').forEach((root, index) => {
+    const track = root.querySelector<HTMLElement>('.slider-track');
+    const [back, next] = Array.from(root.querySelectorAll<HTMLButtonElement>('button[data-dir]'));
+    const toggle = root.querySelector<HTMLButtonElement>('button[data-toggle]');
+    const labels = JSON.parse(root.dataset.labels || '{"play":"Play","pause":"Pause"}');
+    if (!track || !back || !next) return;
+
+    const step = () => Math.max(track.clientWidth * 0.8, 240);
+    const update = () => {
+      back.disabled = track.scrollLeft <= 4;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    };
+    back.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    track.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+
+    let paused = reduced; // reduced motion: start paused, the button can still start it
+    let hover = false;
+    let visible = false;
+    let timer: number | undefined;
+
+    const advance = () => {
+      const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+      track.scrollTo({ left: atEnd ? 0 : track.scrollLeft + (track.firstElementChild as HTMLElement).offsetWidth + 16, behavior: 'smooth' });
+    };
+    const sync = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+      if (!paused && !hover && visible && !document.hidden) timer = window.setInterval(advance, 3500 + index * 700);
+      if (toggle) {
+        toggle.setAttribute('aria-pressed', String(paused));
+        toggle.title = paused ? labels.play : labels.pause;
+        toggle.querySelector('[data-icon=pause]')?.classList.toggle('hidden', paused);
+        toggle.querySelector('[data-icon=play]')?.classList.toggle('hidden', !paused);
+      }
+    };
+
+    new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); }, { threshold: 0.3 }).observe(root);
+    document.addEventListener('visibilitychange', sync);
+    root.addEventListener('pointerenter', () => { hover = true; sync(); });
+    root.addEventListener('pointerleave', () => { hover = false; sync(); });
+    root.addEventListener('focusin', () => { hover = true; sync(); });
+    root.addEventListener('focusout', () => { hover = false; sync(); });
+    toggle?.addEventListener('click', () => { paused = !paused; sync(); });
+    sync();
+  });
+</script>

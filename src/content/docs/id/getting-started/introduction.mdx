@@ -1,0 +1,36 @@
+---
+title: Pengantar
+description: Apa itu PHPNuxBill, untuk siapa, dan bagaimana bagian-bagiannya saling terhubung.
+section: getting-started
+order: 1
+---
+PHPNuxBill adalah sistem billing untuk ISP dan operator hotspot yang menjalankan router Mikrotik. Pelanggan membeli paket, sistem membuat akun mereka di router (atau di FreeRADIUS), lalu menghapusnya saat paket habis.
+
+## Yang Anda dapatkan
+
+- **Paket Hotspot dan PPPoE** di satu atau beberapa router Mikrotik, atau lewat FreeRADIUS.
+- **Voucher**: buat dan cetak dalam jumlah banyak, atau jual lewat portal pelanggan.
+- **Portal pelanggan** untuk pendaftaran, isi saldo, pembelian paket, dan riwayat.
+- **Payment gateway**, **perangkat**, **plugin**, dan **tema** yang dipasang dari Marketplace bawaan.
+- **Peran staf** dengan menu masing-masing: `SuperAdmin`, `Admin`, `Report`, `Agent`, `Sales`, `Asset`, dan `Support`.
+
+## Bagaimana sistem ini dibangun
+
+Ini adalah PHP biasa dengan database MySQL dan tanpa framework. Root repositori adalah web root, tidak ada proses build, dan halaman dirender dengan template Smarty. Karena itu mudah dihosting di server bersama atau Raspberry Pi, dan mudah dibaca saat Anda perlu mengubah sesuatu.
+
+| Bagian | Lokasi |
+|---|---|
+| Halaman (controller) | `system/controllers/` |
+| Template | `ui/ui/` (tema menimpanya dari `ui/themes/`) |
+| Plugin | `system/plugin/` |
+| Payment gateway | `system/paymentgateway/` |
+| Driver perangkat | `system/devices/` |
+| Skema dan migrasi | `install/phpnuxbill.sql` dan `system/updates.json` |
+
+## Langkah berikutnya
+
+1. [Pasang sistemnya](/id/docs/getting-started/installation/) dan atur cron job.
+2. Pelajari cara kerja [voucher](/id/docs/using/vouchers/) dan [peran](/id/docs/using/roles/).
+3. Jika Anda menulis kode, mulai dengan [panduan plugin](/id/docs/extending/plugins/) (dalam bahasa Inggris).
+
+PHPNuxBill adalah perangkat lunak bebas di bawah GNU General Public License, versi 2 atau yang lebih baru.

@@ -1,0 +1,15 @@
+---
+title: Instalar en cPanel
+description: Instala PHPNuxBill en un hosting compartido con cPanel.
+section: getting-started
+order: 4
+---
+1. Descarga la última versión desde la [página de versiones](https://github.com/hotspotbilling/phpnuxbill-ultimate/releases) y sube el archivo ZIP con el Administrador de archivos de cPanel.
+2. Extrae el ZIP en la carpeta que quieras, por ejemplo `public_html`.
+3. Crea una base de datos MySQL y un usuario en cPanel, y dale al usuario todos los privilegios sobre la base de datos.
+4. Abre la carpeta en el navegador, por ejemplo `https://yourdomain.com`, y sigue el instalador. Introduce los datos de la base de datos que acabas de crear.
+5. Inicia sesión en el panel de administración.
+6. Elimina la carpeta `install` del servidor.
+7. Añade las tareas cron de [Instalación](/es/docs/getting-started/installation/). cPanel tiene una página *Cron Jobs* para esto.
+
+> Un hosting compartido ejecuta PHPNuxBill y los tipos de dispositivo Mikrotik. [FreeRADIUS](/es/docs/using/freeradius/) necesita un VPS o un servidor dedicado.

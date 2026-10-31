@@ -1,0 +1,15 @@
+---
+title: cPanel'e kurulum
+description: PHPNuxBill'i cPanel'li paylaşımlı barındırmaya kurun.
+section: getting-started
+order: 4
+---
+1. En son sürümü [sürümler sayfasından](https://github.com/hotspotbilling/phpnuxbill-ultimate/releases) indirin ve ZIP dosyasını cPanel Dosya Yöneticisi ile yükleyin.
+2. ZIP dosyasını istediğiniz klasöre çıkarın, örneğin `public_html`.
+3. cPanel'de bir MySQL veritabanı ve kullanıcı oluşturun, kullanıcıya veritabanı üzerinde tüm yetkileri verin.
+4. Klasörü tarayıcınızda açın, örneğin `https://yourdomain.com`, ve yükleyiciyi izleyin. Az önce oluşturduğunuz veritabanı bilgilerini girin.
+5. Yönetim paneline giriş yapın.
+6. `install` klasörünü sunucudan silin.
+7. [Kurulum](/tr/docs/getting-started/installation/) sayfasındaki cron görevlerini ekleyin. cPanel'de bunun için bir *Cron Jobs* sayfası vardır.
+
+> Paylaşımlı barındırma, PHPNuxBill'i ve Mikrotik cihaz türlerini çalıştırır. [FreeRADIUS](/tr/docs/using/freeradius/) için bir VPS veya ayrılmış sunucu gerekir.

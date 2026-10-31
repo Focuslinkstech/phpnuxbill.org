@@ -1,0 +1,26 @@
+---
+title: Payment gateways
+description: The functions a gateway provides and how the billing system calls them.
+section: extending
+order: 11
+---
+A gateway is a folder `system/paymentgateway/<slug>/` with `gateway.json`, `<slug>.php` and a `ui/` folder (a single file in
+`system/paymentgateway/` also works). The billing system includes the gateway file only when it is needed: at checkout, on the
+gateway settings page and for the provider's webhook. It then calls functions named after the slug.
+
+| Function | Job |
+|---|---|
+| `<slug>_validate_config()` | Before every checkout: redirect with a message if the admin has not configured it. |
+| `<slug>_show_config()` / `<slug>_save_config()` | The admin's settings page and its POST. Check CSRF; settings live in `tbl_appconfig` as `<slug>_*`. |
+| `<slug>_create_transaction($trx, $user)` | The customer chose the gateway: create the payment at the provider and redirect. |
+| `<slug>_get_status($trx, $user)` | The customer returns, or presses "check payment". |
+| `<slug>_payment_notification()` | The provider's webhook at `callback/<slug>`: verify the signature, settle the order. |
+
+## Rules that save you trouble
+
+- **Settling must be idempotent.** Polling and the webhook can both arrive for the same order.
+- **Resolve the file with `GatewayLoader::file($slug)`**, never by joining paths yourself.
+- **Templates** go in `ui/<slug>.tpl` and are referenced as plain `<slug>.tpl` or `pg:<slug>.tpl`.
+- **A gateway with a PHP error**, an unmet requirement or a missing licence cannot be enabled.
+
+The full contract, with status codes and webhook-security notes, is in the starter's `gateway/README.md`.

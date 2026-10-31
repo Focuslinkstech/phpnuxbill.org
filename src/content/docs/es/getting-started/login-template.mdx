@@ -1,0 +1,38 @@
+---
+title: Plantilla de inicio de sesión del hotspot
+description: Instala la plantilla de inicio de sesión de PHPNuxBill en un hotspot Mikrotik para que los clientes lleguen a tu portal.
+section: getting-started
+order: 8
+---
+Los clientes de un hotspot ven primero la página de acceso del router. La plantilla de inicio de sesión reemplaza esa página, de modo que los clientes llegan a tu portal de PHPNuxBill para registrarse, comprar un plan e iniciar sesión. La necesitas para los planes de hotspot. Los clientes PPPoE no la usan.
+
+## Configúrala
+
+1. Descarga la [plantilla de inicio de sesión](https://github.com/hotspotbilling/phpnuxbill-mikrotik-login-template).
+2. Abre `login.html`, `status.html` y `logout.html`. Busca `TODO` en cada uno y sigue la instrucción que aparece. Piden la dirección de tu sitio PHPNuxBill.
+3. Elimina `errors.txt` y luego renombra `errors.en.txt` a `errors.txt`.
+4. Reemplaza `background.jpg` por tu propia imagen.
+5. Elimina la carpeta `remove_me`.
+6. Sube todo a la carpeta `hotspot` del router y sobrescribe los archivos que haya. Usa WinBox, *Files*.
+
+## Añade tu sitio al walled garden
+
+El cliente todavía no ha iniciado sesión, así que el router bloquea todo. Añade el dominio o la dirección IP de tu PHPNuxBill al **walled garden** del hotspot (*IP > Hotspot > Walled Garden*). Sin esto, el cliente llega a tu portal y la página nunca carga. Añade también los dominios que usa tu pasarela de pago, o la página de pago no se abrirá.
+
+## Qué recibe el portal
+
+Cuando el router envía a un cliente a PHPNuxBill, le pasa los datos del cliente. PHPNuxBill valida cada uno y lo conserva durante la visita:
+
+| Valor | Significado |
+|---|---|
+| `nux-mac` | La dirección MAC del cliente |
+| `nux-ip` | La dirección IP del cliente |
+| `nux-router` | El nombre del router |
+| `nux-key` | Los datos CHAP usados para iniciar la sesión del cliente |
+| `nux-hostname` | El nombre del dispositivo del cliente |
+
+Así es como un cliente que acaba de pagar inicia sesión en el router correcto sin escribir nada.
+
+## Compruébalo
+
+Conecta un teléfono al hotspot y abre cualquier página web. Deberías llegar a tu portal. Si ves la página antigua del router, los archivos no se sobrescribieron. Si la página nunca carga, revisa el walled garden.

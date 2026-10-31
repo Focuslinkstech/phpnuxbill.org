@@ -1,0 +1,26 @@
+---
+title: Ödeme geçitleri
+description: Bir ödeme geçidinin sağladığı fonksiyonlar ve faturalama sisteminin bunları nasıl çağırdığı.
+section: extending
+order: 11
+---
+Ödeme geçidi, içinde `gateway.json`, `<slug>.php` ve bir `ui/` klasörü bulunan `system/paymentgateway/<slug>/` klasörüdür
+(`system/paymentgateway/` altındaki tek bir dosya da çalışır). Faturalama sistemi geçit dosyasını yalnızca gerektiğinde yükler: ödeme
+sırasında, geçit ayarları sayfasında ve sağlayıcının webhook'u için. Ardından slug'a göre adlandırılmış fonksiyonları çağırır.
+
+| Fonksiyon | Görevi |
+|---|---|
+| `<slug>_validate_config()` | Her ödemeden önce: yönetici yapılandırmadıysa bir mesajla yönlendirir. |
+| `<slug>_show_config()` / `<slug>_save_config()` | Yöneticinin ayar sayfası ve bu sayfanın POST isteği. CSRF'yi denetleyin; ayarlar `tbl_appconfig` içinde `<slug>_*` olarak tutulur. |
+| `<slug>_create_transaction($trx, $user)` | Müşteri geçidi seçti: ödemeyi sağlayıcıda oluşturun ve yönlendirin. |
+| `<slug>_get_status($trx, $user)` | Müşteri geri döner veya "ödemeyi kontrol et" düğmesine basar. |
+| `<slug>_payment_notification()` | Sağlayıcının `callback/<slug>` adresindeki webhook'u: imzayı doğrulayın, siparişi tamamlayın. |
+
+## Başınızı ağrıtmayacak kurallar
+
+- **Siparişi tamamlama işlemi idempotent olmalıdır.** Aynı sipariş için hem yoklama (polling) hem de webhook gelebilir.
+- **Dosyayı `GatewayLoader::file($slug)` ile çözün**, yolları kendiniz birleştirmeyin.
+- **Şablonlar** `ui/<slug>.tpl` içine konur ve düz `<slug>.tpl` veya `pg:<slug>.tpl` olarak başvurulur.
+- **PHP hatası olan**, gereksinimi karşılanmayan veya lisansı eksik bir ödeme geçidi etkinleştirilemez.
+
+Durum kodları ve webhook güvenliği notlarını içeren tam sözleşme, başlangıç paketindeki `gateway/README.md` dosyasındadır.

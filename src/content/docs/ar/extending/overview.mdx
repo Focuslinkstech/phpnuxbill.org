@@ -1,0 +1,33 @@
+---
+title: أنواع الإضافات
+description: الإضافات وبوابات الدفع والأجهزة والقوالب، والقالب الجاهز الذي ينشئ كلًّا منها.
+section: extending
+order: 1
+---
+يتعامل المتجر (Marketplace) مع أنواع الإضافات الأربعة بالطريقة نفسها: التثبيت والتحديث (مع نسخة احتياطية) والإزالة وفحص المتطلبات وملف المستودع. الفرق في الشكل فقط.
+
+| | إضافة | بوابة دفع | مشغّل جهاز | قالب |
+|---|---|---|---|---|
+| المكان | `system/plugin/` | `system/paymentgateway/` | `system/devices/` | `ui/themes/` |
+| ملف التعريف | `plugin.json` | `gateway.json` | `device.json` | `theme.json` |
+| الهيكل | مجلد أو ملف واحد | مجلد أو ملف واحد | مجلد أو ملف واحد | مجلد فقط |
+| نقطة الدخول | `<slug>.php` يُحمَّل في كل طلب | `<slug>.php` يُحمَّل عند الحاجة | `<Class>.php` و`new <Class>` | قوالب و`functions.php` اختياري |
+
+## ابدأ من القالب الجاهز
+
+[قالب الإضافات الجاهز](https://github.com/hotspotbilling/phpnuxbill-ultimate-extensions-starter) يضم مثالًا جاهزًا للنسخ لكل نوع، مع تعليقات على كل واجهة برمجية يستطيع المطوّر استخدامها. وهو ينشئ أيضًا نسخة مضغوطة بالاسم الجديد يستطيع المتجر تثبيتها:
+
+```bash
+php skeletons/build.php new plugin   acme_sms    "Acme SMS"
+php skeletons/build.php new gateway  acme_pay    "Acme Pay"
+php skeletons/build.php new device   AcmeRouter  "Acme Router"
+php skeletons/build.php new theme    acme_theme  "Acme Theme"
+```
+
+افحص الإضافة قبل نشرها:
+
+```bash
+php skeletons/build.php check plugin <folder>
+```
+
+ثم اقرأ صفحة نوعك: [الإضافات](/ar/docs/extending/plugins/) (بالإنجليزية) أو [بوابات الدفع](/ar/docs/extending/gateways/) أو [الأجهزة](/ar/docs/extending/devices/) أو [القوالب](/ar/docs/extending/themes/).

@@ -1,0 +1,38 @@
+---
+title: Hotspot giriş şablonu
+description: PHPNuxBill giriş şablonunu bir Mikrotik hotspot'a yerleştirin; müşteriler portalınıza yönlendirilsin.
+section: getting-started
+order: 8
+---
+Hotspot müşterileri önce router'ın giriş sayfasıyla karşılaşır. Giriş şablonu bu sayfanın yerini alır; böylece müşteriler kayıt olmak, paket satın almak ve oturum açmak için PHPNuxBill portalınıza yönlendirilir. Hotspot paketleri için buna ihtiyacınız vardır. PPPoE müşterileri bunu kullanmaz.
+
+## Kurulum
+
+1. [Giriş şablonunu](https://github.com/hotspotbilling/phpnuxbill-mikrotik-login-template) indirin.
+2. `login.html`, `status.html` ve `logout.html` dosyalarını açın. Her birinde `TODO` araması yapın ve orada yazan talimatı izleyin. Sizden PHPNuxBill sitenizin adresini isterler.
+3. `errors.txt` dosyasını silin, ardından `errors.en.txt` dosyasını `errors.txt` olarak yeniden adlandırın.
+4. `background.jpg` dosyasını kendi resminizle değiştirin.
+5. `remove_me` klasörünü silin.
+6. Her şeyi router'ın `hotspot` klasörüne yükleyin ve oradaki dosyaların üzerine yazın. WinBox'ta *Files* bölümünü kullanın.
+
+## Sitenizi walled garden'a ekleyin
+
+Müşteri henüz oturum açmadığı için router her şeyi engeller. PHPNuxBill alan adınızı veya IP adresinizi hotspot'un **walled garden** listesine ekleyin (*IP > Hotspot > Walled Garden*). Bunu yapmazsanız müşteri portalınıza yönlendirilir ama sayfa hiç yüklenmez. Ödeme geçidinizin kullandığı alan adlarını da ekleyin, yoksa ödeme sayfası açılmaz.
+
+## Portalın aldığı değerler
+
+Router bir müşteriyi PHPNuxBill'e yönlendirirken müşterinin bilgilerini de iletir. PHPNuxBill her birini denetler ve ziyaret boyunca saklar:
+
+| Değer | Anlamı |
+|---|---|
+| `nux-mac` | Müşterinin MAC adresi |
+| `nux-ip` | Müşterinin IP adresi |
+| `nux-router` | Router'ın adı |
+| `nux-key` | Müşterinin oturum açmasında kullanılan CHAP bilgileri |
+| `nux-hostname` | Müşterinin cihaz adı |
+
+Az önce ödeme yapan bir müşteri, hiçbir şey yazmadan doğru router'da bu sayede oturum açar.
+
+## Kontrol edin
+
+Hotspot'a bir telefon bağlayın ve herhangi bir web sayfası açın. Portalınıza yönlenmeniz gerekir. Router'ın eski sayfasını görüyorsanız dosyaların üzerine yazılmamıştır. Sayfa hiç yüklenmiyorsa walled garden'ı kontrol edin.

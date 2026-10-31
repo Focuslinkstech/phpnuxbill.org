@@ -1,0 +1,68 @@
+---
+title: Router bağlama
+description: Mikrotik router'ınızı ekleyin, bir paket oluşturun ve bir voucher ile test edin.
+section: getting-started
+order: 7
+---
+Bu sayfa, yeni bir kurulumdan çalışan bir satışa giden en kısa yolu anlatır: Mikrotik router'ınızı ekleyin, bir paket oluşturun, ardından test müşterisi olarak bir voucher ile satın alın. [Kurulumu](/tr/docs/getting-started/installation/) tamamladığınızı ve yönetici olarak oturum açabildiğinizi varsayar.
+
+## 1. Router'ı hazırlayın
+
+PHPNuxBill, Mikrotik router ile RouterOS API üzerinden konuşur.
+
+- **API hizmetini açın.** WinBox'ta *IP > Services* bölümünü açın ve `api` hizmetinin etkin olduğundan emin olun. Varsayılan portu `8728`'dir.
+- **Router üzerinde PHPNuxBill için bir kullanıcı oluşturun.** `admin` yerine ayrı bir kullanıcı daha iyidir. Başlangıç için tam yetki en basitidir; kurulumunuzun neye ihtiyaç duyduğunu öğrendikten sonra yetkileri kısıtlayabilirsiniz.
+- **Sunucunun router'a o porttan ulaşabildiğinden emin olun.** PHPNuxBill uzak bir ana bilgisayarda çalışıyorsa, API portuna herkes değil yalnızca sunucu erişebilsin diye genellikle bir güvenlik duvarı kuralı veya VPN gerekir.
+
+## 2. Router'ı ekleyin
+
+*Network > Routers* sayfasını açın ve bir router ekleyin:
+
+| Alan | Ne girmelisiniz |
+|---|---|
+| Status | Enable |
+| Router Name / Location | Tanıyacağınız bir ad, örneğin hizmet verdiği yer |
+| IP Address | Router'ın adresi; varsayılan değilse portla birlikte: `192.168.88.1` veya `192.168.88.1:8728` |
+| Username | Oluşturduğunuz RouterOS kullanıcısı |
+| Router Secret | O kullanıcının parolası |
+| Description | İsteğe bağlı, örneğin kapsadığı bölge |
+
+*Test Connection* kutusunu işaretli bırakın ve kaydedin. Test başarısız olursa mesaj nedenini söyler. Olağan nedenler: API hizmetinin kapalı olması, yanlış port, yanlış parola veya aradaki bir güvenlik duvarı.
+
+## 3. Bir bant genişliği profili oluşturun
+
+*Internet Plan > Bandwidth* sayfasını açın ve bir profil ekleyin: bir ad ile indirme ve yükleme hızı. Paketler bu profillerden birini seçer; böylece aynı hızı birkaç pakette yeniden kullanabilirsiniz.
+
+## 4. Bir paket oluşturun
+
+*Internet Plan > Hotspot* (veya *PPPOE*) sayfasını açın ve bir paket ekleyin:
+
+- **Active** ve **Prepaid**; paket türü olarak **Personal** veya **Business**.
+- Müşterilerin göreceği bir **Plan Name**.
+- **Unlimited** veya süreye, veriye ya da her ikisine göre **Limited**.
+- Önceki adımdaki **Bandwidth** profili.
+- **Package Price** ve paketin ne kadar süreceği (**Validity**).
+- Eklediğiniz **Router**.
+
+Kaydedin. Paket router üzerinde sizin için oluşturulur.
+
+## 5. Voucher ile test edin
+
+1. *Services > Vouchers* sayfasını açın ve yeni paket için bir voucher ekleyin. Formu [Voucher'lar](/tr/docs/using/vouchers/) sayfası açıklar.
+2. Müşteri portalınızı açın, bir test müşterisi kaydedin ve kodu *Voucher Activation* altına girin.
+3. Hesap router üzerinde oluşturulur. Çalıştığını kontrol etmek için hotspot'a bir cihaz bağlayın ve oturum açın.
+
+## 6. Cron görevini ayarlayın
+
+Paketler yalnızca [cron görevi](/tr/docs/getting-started/installation/) çalıştığında zamanında biter. Gerçek müşteriler gelmeden önce bunu şimdi yapın.
+
+## Bir şeyler ters giderse
+
+| Gördüğünüz | Kontrol edin |
+|---|---|
+| *Test Connection* başarısız oluyor | API hizmeti etkin mi, port doğru ve sunucudan erişilebilir mi, kullanıcı adı ve parola doğru mu. |
+| Müşteri paket satın aldı ama çevrimiçi değil | Pakette beklediğiniz router seçili mi, router bağlantısı hâlâ çalışıyor mu ve *Logs* sayfasında o müşteri için hata var mı. |
+| Bir paket bitmiyor | Cron görevi çalışıyor mu. Gösterge paneli, görev 24 saattir çalışmadıysa sizi uyarır. |
+| Bir sayfa boş hata gösteriyor | Gerçek hatayı görmek için test makinesinde `config.php` içindeki `$_app_stage` değerini `Live` dışında bir şeye ayarlayın. |
+
+Hâlâ takıldınız mı? [Yardım alma](/tr/docs/getting-started/getting-help/) sayfasına bakın.

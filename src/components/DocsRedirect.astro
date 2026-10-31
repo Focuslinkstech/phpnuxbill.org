@@ -1,0 +1,9 @@
+---
+import { localePath, type Lang } from '../i18n';
+interface Props { lang: Lang; }
+const to = localePath(Astro.props.lang, '/docs/getting-started/introduction/');
+---
+<!doctype html>
+<html lang={Astro.props.lang}><head><meta charset="utf-8" /><title>…</title>
+<meta http-equiv="refresh" content={`0; url=${to}`} /><link rel="canonical" href={to} /></head>
+<body><a href={to}>Documentation</a></body></html>

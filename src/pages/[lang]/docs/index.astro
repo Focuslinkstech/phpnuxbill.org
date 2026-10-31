@@ -1,0 +1,7 @@
+---
+import DocsRedirect from '../../../components/DocsRedirect.astro';
+import { OTHER_LANGS } from '../../../i18n';
+export function getStaticPaths() { return OTHER_LANGS.map((lang) => ({ params: { lang } })); }
+const { lang } = Astro.params;
+---
+<DocsRedirect lang={lang as any} />

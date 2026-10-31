@@ -1,0 +1,68 @@
+---
+title: Conecta un router
+description: Añade tu router Mikrotik, crea un plan y pruébalo con un voucher.
+section: getting-started
+order: 7
+---
+Esta guía recorre el camino más corto desde una instalación nueva hasta una venta funcionando: añade tu router Mikrotik, crea un plan y cómpralo con un voucher como cliente de prueba. Supone que ya terminaste la [instalación](/es/docs/getting-started/installation/) y que puedes iniciar sesión como administrador.
+
+## 1. Prepara el router
+
+PHPNuxBill se comunica con un router Mikrotik a través de la API de RouterOS.
+
+- **Activa el servicio API.** En WinBox, abre *IP > Services* y comprueba que `api` esté habilitado. Su puerto por defecto es el `8728`.
+- **Crea un usuario para PHPNuxBill** en el router. Un usuario dedicado es mejor que `admin`. Los permisos completos son lo más sencillo para empezar, y puedes restringirlos después, cuando sepas qué necesita tu instalación.
+- **Asegúrate de que el servidor llega al router** por ese puerto. Si PHPNuxBill está en un host remoto, normalmente necesitas una regla de firewall o una VPN para que el puerto de la API sea accesible desde el servidor y no desde todo el mundo.
+
+## 2. Añade el router
+
+Abre *Network > Routers* y añade uno:
+
+| Campo | Qué escribir |
+|---|---|
+| Status | Enable |
+| Router Name / Location | Un nombre que reconozcas, por ejemplo el lugar al que da servicio |
+| IP Address | La dirección del router, con el puerto si no es el predeterminado: `192.168.88.1` o `192.168.88.1:8728` |
+| Username | El usuario de RouterOS que creaste |
+| Router Secret | La contraseña de ese usuario |
+| Description | Opcional, por ejemplo la zona que cubre |
+
+Deja marcada la casilla *Test Connection* y guarda. Si la prueba falla, el mensaje te dice por qué. Las causas habituales son el servicio API apagado, el puerto equivocado, una contraseña incorrecta o un firewall en medio.
+
+## 3. Crea un perfil de ancho de banda
+
+Abre *Internet Plan > Bandwidth* y añade un perfil: un nombre y la velocidad de bajada y de subida. Los planes eligen uno de ellos, así que puedes reutilizar la misma velocidad en varios planes.
+
+## 4. Crea un plan
+
+Abre *Internet Plan > Hotspot* (o *PPPOE*) y añade un plan:
+
+- **Active** y **Prepaid**, con **Personal** o **Business** como tipo de plan.
+- Un **Plan Name** que verán los clientes.
+- **Unlimited**, o **Limited** por tiempo, por datos o por ambos.
+- El perfil de **Bandwidth** del paso anterior.
+- El **Package Price** y cuánto dura el plan (**Validity**).
+- El **Router** que añadiste.
+
+Guárdalo. El plan se crea en el router por ti.
+
+## 5. Prueba con un voucher
+
+1. Abre *Services > Vouchers* y añade un voucher para el plan nuevo. La página de [Vouchers](/es/docs/using/vouchers/) explica el formulario.
+2. Abre el portal del cliente, registra un cliente de prueba e introduce el código en *Voucher Activation*.
+3. La cuenta se crea en el router. Conecta un dispositivo al hotspot e inicia sesión para comprobar que funciona.
+
+## 6. Configura el cron
+
+Los planes solo terminan a tiempo cuando el [cron](/es/docs/getting-started/installation/) se ejecuta. Hazlo ahora, antes de que lleguen clientes reales.
+
+## Si algo sale mal
+
+| Qué ves | Qué revisar |
+|---|---|
+| *Test Connection* falla | El servicio API está habilitado, el puerto es correcto y accesible desde el servidor, y el usuario y la contraseña son correctos. |
+| Un cliente compró un plan pero no está en línea | El plan tiene el router que esperas, la conexión con el router sigue funcionando y *Logs* no muestra errores para ese cliente. |
+| Un plan no termina | El cron se está ejecutando. El panel te avisa cuando lleva 24 horas sin ejecutarse. |
+| Una página muestra un error en blanco | En una máquina de pruebas, cambia `$_app_stage` en `config.php` a algo distinto de `Live` para ver el error real. |
+
+¿Sigues atascado? Consulta [Obtener ayuda](/es/docs/getting-started/getting-help/).

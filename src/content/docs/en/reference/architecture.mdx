@@ -1,0 +1,42 @@
+---
+title: Architecture
+description: How a request moves through the application, and the conventions the code follows.
+section: reference
+order: 1
+---
+## Request lifecycle
+
+```
+index.php  →  system/vendor/autoload.php
+           →  system/boot.php
+                 →  init.php   (autoloader, config.php, database, plugins, settings)
+                 →  Smarty as $ui, template folders
+                 →  $routes = explode('/', $_GET['_route'])
+                 →  system/controllers/{$routes[0]}.php
+```
+
+The rewrite rule sends any path that is not a file to `index.php?_route=$1`, so `/customers/edit/5` and
+`?_route=customers/edit/5` are the same request. `$routes[1]` is the action and `$routes[2]` the id.
+
+`system/api.php` is a second entry point. It runs the same controllers but returns the assigned variables as JSON, which is why
+controllers use `$ui->assign()`, `r2()` and `showResult()` instead of printing.
+
+## Conventions
+
+| Topic | Convention |
+|---|---|
+| Classes | No namespaces. `Foo` loads from `system/autoload/Foo.php`. |
+| Database | Idiorm: `ORM::for_table('tbl_customers')->where(...)->find_one()`. |
+| Schema changes | Add them to `install/phpnuxbill.sql` and as a new version key in `system/updates.json`. |
+| Authentication | `_admin()` for staff pages, `_auth()` for customer pages. |
+| Input | `_post()`, `_get()`, `_req()` trim only. They do not escape. |
+| CSRF | Generate with `Csrf::generateAndStoreToken()`, check with `Csrf::check()` before changing data. |
+| Redirects | `r2(getUrl('path'), 's' or 'e' or 'w', Lang::T('Message'))`. |
+| Translation | `Lang::T('English string')`, backed by `system/lan/*.json`. |
+| Logging | `_log($description, $type, $userid)` writes to `tbl_logs`. |
+
+## Extension points
+
+Plugins register menus, routes and hooks (`register_menu()`, `register_route()`, `register_hook()`). Controllers call
+`run_hook('name')` where a plugin may add to the page. Payment gateways, devices and widgets are loaded by name from their own
+folders. See [Extension types](/docs/extending/overview/).

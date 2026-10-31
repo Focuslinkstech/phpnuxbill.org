@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import { pages } from '../i18n/pages';
+import { ui, type Lang } from '../i18n';
+import { COMMUNITY, SPONSOR, SUPPORT } from '../site';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const P = pages[lang].support;
+const F = ui[lang].footer;
+const channels: [string, string][] = [
+  [F.forum, COMMUNITY.forum],
+  [F.telegram, COMMUNITY.telegram],
+  [F.facebook, COMMUNITY.facebook],
+  [F.discussions, COMMUNITY.discussions],
+];
+if (!SUPPORT.telegram) console.warn('[support] SUPPORT.telegram is empty in src/site.ts, so the contact button is not shown');
+---
+<Base title={P.title} description={P.description}>
+  <div class="mx-auto max-w-6xl px-4 py-12 lg:py-16">
+    <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">{P.title}</h1>
+    <p class="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{P.intro}</p>
+
+    <div class="mt-12 grid gap-6 lg:grid-cols-2">
+      <section class="rounded-2xl border bg-card p-6 sm:p-8" aria-labelledby="free-help">
+        <h2 id="free-help" class="text-2xl font-semibold tracking-tight">{P.freeTitle}</h2>
+        <p class="mt-3 leading-relaxed text-muted-foreground">{P.freeText}</p>
+        <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+          {channels.map(([label, url]) => (
+            <li><a href={url} rel="noopener" class="block rounded-lg border px-4 py-3 font-medium hover:bg-accent">{label}</a></li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="rounded-2xl border-2 border-brand bg-card p-6 sm:p-8" aria-labelledby="paid-help">
+        <h2 id="paid-help" class="text-2xl font-semibold tracking-tight">{P.paidTitle}</h2>
+        <p class="font-display mt-3 text-4xl font-semibold text-brand">{P.price}</p>
+        <p class="mt-3 leading-relaxed text-muted-foreground">{P.paidText}</p>
+        <h3 class="mt-6 font-semibold">{P.includesTitle}</h3>
+        <ul class="mt-3 space-y-2">
+          {P.includes.map((item) => (
+            <li class="flex gap-3"><svg class="mt-1 h-4 w-4 flex-none text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span>{item}</span></li>
+          ))}
+        </ul>
+        <p class="mt-6 text-sm text-muted-foreground">{P.by}</p>
+      </section>
+    </div>
+
+    <section class="mt-10 rounded-2xl bg-muted/60 p-6 sm:p-8" aria-labelledby="how-to-ask">
+      <h2 id="how-to-ask" class="text-2xl font-semibold tracking-tight">{P.contactTitle}</h2>
+      <p class="mt-3 max-w-2xl leading-relaxed text-muted-foreground">{P.contactText}</p>
+      {SUPPORT.telegram && <a href={SUPPORT.telegram} rel="noopener" class="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white hover:brightness-110">{P.contact}</a>}
+    </section>
+
+    <section class="mt-10 rounded-2xl border p-6 sm:p-8" aria-labelledby="sponsor">
+      <h2 id="sponsor" class="text-2xl font-semibold tracking-tight">{P.sponsorTitle}</h2>
+      <p class="mt-3 max-w-2xl leading-relaxed text-muted-foreground">{P.sponsorText}</p>
+      <ul class="mt-6 flex flex-wrap gap-3">
+        {SPONSOR.map(([label, url]) => (
+          <li><a href={url} rel="noopener" class="inline-block rounded-full border px-5 py-2.5 text-sm font-medium hover:bg-accent">{label}</a></li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</Base>

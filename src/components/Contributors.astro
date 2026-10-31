@@ -1,0 +1,26 @@
+---
+import type { Contributor } from '../data/community';
+import { DEFAULT_LANG, ui, type Lang } from '../i18n';
+interface Props { people: Contributor[]; authors: string[]; }
+const { people, authors } = Astro.props;
+const lang = (Astro.currentLocale ?? DEFAULT_LANG) as Lang;
+const t = ui[lang].contributors;
+// Avatars come from GitHub; ask for a small size so each one is a few KB.
+const small = (u: string) => `${u}${u.includes('?') ? '&' : '?'}s=96`;
+---
+<div>
+  <ul class="flex flex-wrap gap-3" aria-label={t.label}>
+    {people.map((p) => (
+      <li>
+        <a href={p.url} rel="noopener" title={`${p.login}: ${p.contributions} contributions`} class="block rounded-full ring-offset-2 ring-offset-background transition hover:ring-2 hover:ring-brand">
+          <img src={small(p.avatar)} alt={p.login} width="48" height="48" loading="lazy" class="h-12 w-12 rounded-full border bg-muted" />
+        </a>
+      </li>
+    ))}
+  </ul>
+  {authors.length > 0 && (
+    <p class="mt-6 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+      <span class="font-medium text-foreground">{t.authors}</span> <span dir="ltr">{authors.join(', ')}</span>. {t.authorsAfter}
+    </p>
+  )}
+</div>

@@ -1,0 +1,36 @@
+---
+title: مشغّلات الأجهزة
+description: صنف واحد ينشئ حسابات العملاء ويزيلها على راوتر أو أي جهاز آخر.
+section: extending
+order: 12
+---
+المشغّل (driver) صنف واحد. يبنيه محرك الفوترة دون أي وسائط للمُنشئ (`new $plan['device']`)، لذا يجب أن يطابق اسم الصنف اسمَ الملف أو المجلد. تختار الباقة مشغّلها في نموذج الباقة.
+
+| الدالة | متى تُستدعى |
+|---|---|
+| `description()` | عندما تحتاج قائمة الأجهزة إلى عنوان ومؤلف وروابط. |
+| `add_customer($customer, $plan)` / `remove_customer($customer, $plan)` | عند تفعيل العميل أو انتهاء باقته. |
+| `change_username($plan, $from, $to)` | عند تغيير اسم المستخدم. |
+| `add_plan($plan)` / `update_plan($old_name, $plan)` / `remove_plan($plan)` | عند إنشاء الباقة أو تعديلها أو حذفها. |
+| `connect_customer(...)` / `online_customer(...)` / `disconnect_customer(...)` | تسجيل دخول Hotspot وحالته وتسجيل الخروج. |
+| `sync_customer($customer, $plan)` | اختيارية. تعيد إرسال العميل النشط إلى الجهاز. |
+
+اترك الدوال غير المستخدمة فارغة بدلًا من حذفها.
+
+```php
+class AcmeRouter
+{
+    public function description()
+    {
+        return ['title' => 'Acme Router', 'description' => 'Drives Acme routers.', 'author' => 'You'];
+    }
+
+    public function add_customer($customer, $plan)
+    {
+        $device = ORM::for_table('tbl_routers')->where('name', $plan['routers'])->find_one();
+        // call the device with $customer['username'], $customer['password'], $plan['name_plan']
+    }
+}
+```
+
+لا يمكن استبدال المشغّلات الأساسية (`MikrotikHotspot` و`MikrotikPppoe` و`MikrotikStatic` و`MikrotikVpn` و`Radius` و`RadiusALE` و`RadiusChillispot` و`RadiusRest` و`Voucher` و`Dummy`) برفع ملف، ولا يمكن إزالة مشغّل ما زالت باقات تستخدمه. لا تتعامل مع أجهزة حقيقية عندما تكون قيمة `$_app_stage` هي `Demo`.

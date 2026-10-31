@@ -1,0 +1,33 @@
+---
+title: Jenis ekstensi
+description: Plugin, payment gateway, driver perangkat, dan tema, serta starter yang membuat kerangka masing-masing.
+section: extending
+order: 1
+---
+Marketplace menangani empat jenis ekstensi dengan cara yang sama: pasang, perbarui (dengan cadangan), hapus, pemeriksaan persyaratan, dan file repositori. Yang berbeda adalah bentuknya.
+
+| | Plugin | Payment gateway | Driver perangkat | Tema |
+|---|---|---|---|---|
+| Lokasi | `system/plugin/` | `system/paymentgateway/` | `system/devices/` | `ui/themes/` |
+| Manifes | `plugin.json` | `gateway.json` | `device.json` | `theme.json` |
+| Struktur | folder atau satu file | folder atau satu file | folder atau satu file | hanya folder |
+| Titik masuk | `<slug>.php`, dimuat pada setiap permintaan | `<slug>.php`, dimuat saat dibutuhkan | `<Class>.php`, `new <Class>` | template dan `functions.php` opsional |
+
+## Mulai dari starter
+
+[Starter ekstensi](https://github.com/hotspotbilling/phpnuxbill-ultimate-extensions-starter) berisi contoh siap salin untuk setiap jenis, dengan komentar pada setiap API yang bisa dipakai pengembang. Starter itu juga membuat salinan yang sudah diganti nama dan di-zip, yang bisa dipasang oleh Marketplace:
+
+```bash
+php skeletons/build.php new plugin   acme_sms    "Acme SMS"
+php skeletons/build.php new gateway  acme_pay    "Acme Pay"
+php skeletons/build.php new device   AcmeRouter  "Acme Router"
+php skeletons/build.php new theme    acme_theme  "Acme Theme"
+```
+
+Periksa plugin sebelum dirilis:
+
+```bash
+php skeletons/build.php check plugin <folder>
+```
+
+Lalu baca halaman untuk jenis Anda: [plugin](/id/docs/extending/plugins/) (dalam bahasa Inggris), [payment gateway](/id/docs/extending/gateways/), [driver perangkat](/id/docs/extending/devices/), atau [tema](/id/docs/extending/themes/).

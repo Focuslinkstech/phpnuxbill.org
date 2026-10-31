@@ -1,0 +1,42 @@
+---
+title: Payment gateway
+description: Tambahkan payment gateway, berikan URL callback, dan uji pembayaran sebelum dipakai pelanggan.
+section: using
+order: 12
+---
+Payment gateway memungkinkan pelanggan membayar paket secara online. PHPNuxBill mengaktifkan paket saat gateway mengonfirmasi pembayaran.
+
+## Tambahkan gateway
+
+Tidak ada payment gateway bawaan. Setiap gateway berasal dari [Marketplace](/id/extensions/) atau dari pembuat gateway. Di panel admin, buka Marketplace, masuk ke payment gateway lalu pasang satu, atau unggah paketnya.
+
+Lalu buka **Settings > Payment Gateway**, pilih gateway, dan isi formulirnya. Setiap gateway meminta kunci masing-masing. Gateway berbayar mungkin juga memerlukan kunci lisensi, yang Anda masukkan dari kartunya di Marketplace.
+
+## URL callback
+
+Sebagian besar gateway memberi tahu PHPNuxBill bahwa pembayaran berhasil dengan memanggil sebuah URL di situs Anda. Alamatnya:
+
+```text
+https://your-domain.com/callback/<gateway>
+```
+
+`<gateway>` adalah nama gateway, yaitu nama folder atau filenya. Alamat yang sama juga berlaku sebagai `https://your-domain.com/?_route=callback/<gateway>`. Berikan alamat ini ke gateway saat diminta URL callback, webhook, atau notifikasi.
+
+Alamat itu harus dapat dijangkau dari internet. Gateway tidak bisa memanggil `localhost`, IP privat, atau halaman yang dilindungi login.
+
+## Yang diminta gateway
+
+Sebagian besar meminta kunci dari akun Anda di situs web gateway, seperti client ID dan secret key, serta mata uang yang Anda tagihkan. Beberapa juga meminta URL callback atau webhook, yaitu alamat di atas. Halaman gateway di Marketplace menjelaskan apa yang dibutuhkan.
+
+## Uji sebelum go live
+
+1. Gunakan kunci sandbox atau kunci uji gateway terlebih dahulu.
+2. Sebagai pelanggan, beli paket dan bayar.
+3. Pastikan paket aktif dan transaksi muncul di panel admin.
+4. Ganti dengan kunci live dan lakukan satu pembayaran sungguhan dalam jumlah kecil.
+
+Jika pembayaran tidak mengaktifkan paket, ikuti [Pemecahan masalah](/id/docs/using/troubleshooting/#pelanggan-sudah-membayar-tetapi-paket-tidak-aktif).
+
+## Buat sendiri
+
+Lihat [Payment gateway](/id/docs/extending/gateways/) di panduan pengembangan.

@@ -1,0 +1,33 @@
+---
+title: Roles del personal
+description: Qué puede ver cada rol y cómo restringir una página a algunos de ellos.
+section: using
+order: 2
+---
+Cada cuenta del personal tiene un rol. El rol decide qué entradas de menú aparecen y qué páginas se abren.
+
+| Rol | Uso habitual |
+|---|---|
+| `SuperAdmin` | El propietario. Acceso total, incluida la configuración del sistema. |
+| `Admin` | Gestión diaria de clientes, planes y routers. |
+| `Report` | Acceso de solo lectura a los informes. |
+| `Agent` | Un revendedor que vende a sus propios clientes. |
+| `Sales` | Ventas de mostrador. |
+| `Asset` | Equipos e inventario. |
+| `Support` | Atención al cliente. |
+
+## Panel por rol
+
+La disposición del panel se guarda por rol, así que un usuario `Support` puede ver widgets distintos a los de un `Admin`.
+
+## Proteger una página en código
+
+Los controladores y plugins comprueban el rol directamente:
+
+```php
+if (!in_array($admin['user_type'], ['SuperAdmin', 'Admin'])) {
+    _alert(Lang::T('You do not have permission to access this page'), 'danger', 'dashboard');
+}
+```
+
+Las entradas de menú de los plugins reciben la misma lista en su argumento `auth`. Una lista vacía significa todos.

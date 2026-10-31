@@ -1,0 +1,61 @@
+---
+title: Pasang di VPS
+description: Memasang PHPNuxBill di server Linux Anda sendiri dengan Apache atau Nginx.
+section: getting-started
+order: 5
+---
+## 1. Siapkan server
+
+- Pakai sistem Linux yang didukung seperti Ubuntu atau Debian, dan perbarui paketnya.
+- Pasang web server (Apache atau Nginx), PHP 8.2 atau lebih baru, dan MySQL atau MariaDB.
+- Pasang ekstensi PHP yang tercantum di [Persyaratan](/id/docs/getting-started/installation/#persyaratan).
+- Siapkan firewall.
+- Pasang sertifikat SSL. Let's Encrypt gratis.
+
+## 2. Unduh PHPNuxBill
+
+```bash
+cd /var/www/html
+
+# dengan git
+git clone https://github.com/hotspotbilling/phpnuxbill-ultimate.git .
+
+# atau unduh rilis lalu ekstrak
+wget https://github.com/hotspotbilling/phpnuxbill-ultimate/archive/refs/heads/main.zip
+unzip main.zip
+```
+
+## 3. Buat database
+
+```sql
+CREATE DATABASE phpnuxbill;
+CREATE USER 'phpnuxbilluser'@'localhost' IDENTIFIED BY 'kata_sandi_anda';
+GRANT ALL PRIVILEGES ON phpnuxbill.* TO 'phpnuxbilluser'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Jalankan setelah `mysql -u root -p`.
+
+## 4. Atur web server
+
+- **Apache:** buat virtual host yang mengarah ke folder PHPNuxBill dan aktifkan `mod_rewrite`. File `.htaccess` di root yang mengatur routing.
+- **Nginx:** buat server block dengan root dan penanganan PHP yang sama, lalu arahkan setiap path yang bukan file ke `index.php?_route=$1`.
+
+## 5. Atur izin
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+```
+
+`system/uploads/`, `system/cache/`, `ui/compiled/`, `ui/cache/`, dan `system/lan/` harus tetap bisa ditulis oleh web server.
+
+## 6. Jalankan installer
+
+Buka situs Anda di browser dan ikuti installer. Masukkan detail database dari langkah 3.
+
+## 7. Selesai
+
+- Masuk ke panel admin dan hapus folder `install`.
+- Tambahkan cron job dari [Instalasi](/id/docs/getting-started/installation/#cron).
+- Atur payment gateway, email, dan pengaturan lain di panel admin.

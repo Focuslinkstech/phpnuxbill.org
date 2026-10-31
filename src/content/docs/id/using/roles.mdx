@@ -1,0 +1,33 @@
+---
+title: Peran staf
+description: Apa yang bisa dilihat tiap peran staf dan cara membatasi halaman untuk sebagian peran.
+section: using
+order: 2
+---
+Setiap akun staf memiliki satu peran. Peran menentukan entri menu yang muncul dan halaman yang bisa dibuka.
+
+| Peran | Penggunaan umum |
+|---|---|
+| `SuperAdmin` | Pemilik. Akses penuh, termasuk pengaturan sistem. |
+| `Admin` | Pengelolaan harian pelanggan, paket, dan router. |
+| `Report` | Akses baca saja ke laporan. |
+| `Agent` | Reseller yang menjual ke pelanggannya sendiri. |
+| `Sales` | Penjualan di meja depan. |
+| `Asset` | Peralatan dan inventaris. |
+| `Support` | Dukungan pelanggan. |
+
+## Dasbor per peran
+
+Tata letak dasbor disimpan per peran, jadi pengguna `Support` bisa melihat widget yang berbeda dari `Admin`.
+
+## Membatasi halaman lewat kode
+
+Controller dan plugin memeriksa peran secara langsung:
+
+```php
+if (!in_array($admin['user_type'], ['SuperAdmin', 'Admin'])) {
+    _alert(Lang::T('You do not have permission to access this page'), 'danger', 'dashboard');
+}
+```
+
+Entri menu dari plugin menerima daftar yang sama pada argumen `auth`. Daftar kosong berarti semua orang.

@@ -1,0 +1,33 @@
+---
+title: Themes
+description: Re-skin the admin panel and customer portal by overriding templates and a few colour tokens.
+section: extending
+order: 13
+---
+A theme is a folder in `ui/themes/<slug>/` with a `theme.json`. It overrides templates by path: a file at
+`ui/themes/<slug>/admin/customers/list.tpl` replaces `ui/ui/admin/customers/list.tpl`. Anything it does not override falls back to
+the parent theme (`"parent"` in `theme.json`) and then to the default.
+
+## Optional extras
+
+- **`functions.php`** runs on every request while the theme is active, for example to add a stylesheet or Smarty helpers. It must
+  not print or `exit`, and a PHP error in it blocks activation.
+- **`styles/customer.css`** re-skins the customer portal's header, menu, mobile bar and footer by redefining the `--cm-*` colour
+  tokens, with no template copying.
+- **Dark mode** is the `dark-mode` class on `<body>`. Style both.
+
+```css
+/* styles/customer.css */
+body.cm-chrome.modern-skin-dark {
+  --cm-accent: #18181b;
+  --cm-border: #e4e4e7;
+}
+```
+
+## Template lookup order
+
+1. `ui/ui_custom/`
+2. `ui/themes/<your theme>/`
+3. `ui/ui/`
+
+There is no single-file theme; a theme is always a folder.

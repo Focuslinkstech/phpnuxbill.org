@@ -1,0 +1,39 @@
+---
+title: Controladores de dispositivo
+description: Una clase que crea y elimina cuentas de clientes en un router u otro equipo.
+section: extending
+order: 12
+---
+Un controlador es una clase. El motor de facturación la construye sin argumentos en el constructor (`new $plan['device']`), por lo que el nombre de la clase debe
+ser igual al nombre del archivo o de la carpeta. Cada plan elige su controlador en el formulario del plan.
+
+| Método | Se llama cuando |
+|---|---|
+| `description()` | La lista de dispositivos necesita un título, un autor y enlaces. |
+| `add_customer($customer, $plan)` / `remove_customer($customer, $plan)` | Un cliente se activa o vence. |
+| `change_username($plan, $from, $to)` | Cambia un nombre de usuario. |
+| `add_plan($plan)` / `update_plan($old_name, $plan)` / `remove_plan($plan)` | Se crea, edita o elimina un plan. |
+| `connect_customer(...)` / `online_customer(...)` / `disconnect_customer(...)` | Inicio de sesión, estado y cierre de sesión en el hotspot. |
+| `sync_customer($customer, $plan)` | Opcional. Vuelve a enviar al dispositivo un cliente activo. |
+
+Deja vacíos los métodos que no uses en lugar de borrarlos.
+
+```php
+class AcmeRouter
+{
+    public function description()
+    {
+        return ['title' => 'Acme Router', 'description' => 'Drives Acme routers.', 'author' => 'You'];
+    }
+
+    public function add_customer($customer, $plan)
+    {
+        $device = ORM::for_table('tbl_routers')->where('name', $plan['routers'])->find_one();
+        // call the device with $customer['username'], $customer['password'], $plan['name_plan']
+    }
+}
+```
+
+Los controladores del núcleo (`MikrotikHotspot`, `MikrotikPppoe`, `MikrotikStatic`, `MikrotikVpn`, `Radius`, `RadiusALE`, `RadiusChillispot`,
+`RadiusRest`, `Voucher`, `Dummy`) no se pueden reemplazar subiendo un paquete, y un controlador que todavía usan planes no se puede desinstalar.
+No toques equipos reales cuando `$_app_stage` sea `Demo`.

@@ -1,0 +1,33 @@
+---
+title: Temas
+description: Cambia el aspecto del panel de administración y del portal del cliente sobrescribiendo plantillas y unos pocos tokens de color.
+section: extending
+order: 13
+---
+Un tema es una carpeta en `ui/themes/<slug>/` con un `theme.json`. Sobrescribe las plantillas por ruta: un archivo en
+`ui/themes/<slug>/admin/customers/list.tpl` reemplaza a `ui/ui/admin/customers/list.tpl`. Lo que no sobrescribe vuelve al
+tema padre (`"parent"` en `theme.json`) y después al predeterminado.
+
+## Extras opcionales
+
+- **`functions.php`** se ejecuta en cada petición mientras el tema está activo, por ejemplo para añadir una hoja de estilos o ayudantes de Smarty. No debe
+  imprimir nada ni llamar a `exit`, y un error de PHP en él impide la activación.
+- **`styles/customer.css`** cambia el aspecto del encabezado, el menú, la barra móvil y el pie del portal del cliente redefiniendo los tokens de color
+  `--cm-*`, sin copiar plantillas.
+- **El modo oscuro** es la clase `dark-mode` en `<body>`. Da estilo a ambos.
+
+```css
+/* styles/customer.css */
+body.cm-chrome.modern-skin-dark {
+  --cm-accent: #18181b;
+  --cm-border: #e4e4e7;
+}
+```
+
+## Orden de búsqueda de plantillas
+
+1. `ui/ui_custom/`
+2. `ui/themes/<your theme>/`
+3. `ui/ui/`
+
+No existe un tema de un solo archivo; un tema siempre es una carpeta.

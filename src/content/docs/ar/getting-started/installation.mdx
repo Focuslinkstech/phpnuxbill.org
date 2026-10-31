@@ -1,0 +1,77 @@
+---
+title: التثبيت
+description: المتطلبات، ومثبّت الويب، ومهمة cron التي تُنهي الباقات في وقتها.
+section: getting-started
+order: 3
+---
+## المتطلبات
+
+| المطلوب | ملاحظات |
+|---|---|
+| PHP 8.2 أو أحدث | مع امتدادَي PDO وMySQLi |
+| MySQL | قاعدة البيانات التي يستورد إليها المثبّت |
+| GD2 وcURL وZIP وmbstring | امتدادات PHP |
+| خادم ويب | Apache مع `mod_rewrite`، أو أي خادم يوجّه المسارات غير المعروفة إلى `index.php` |
+
+يُنصح باستخدام Linux. يعمل على Windows لكن جدولة cron هناك أصعب.
+
+ويعمل أيضًا على Raspberry Pi.
+
+### لبيئة الإنتاج
+
+| | الموصى به | أداء أفضل |
+|---|---|---|
+| الخادم | VPS أو خادم مخصص | VPS أو خادم مخصص |
+| المعالج | 1 GHz أو أسرع | رباعي النوى، 3 GHz أو أسرع |
+| الذاكرة (RAM) | 1 GB أو أكثر | 6 GB أو أكثر |
+| القرص | 10 GB أو أكثر | 200 GB أو أكثر |
+| الشبكة | 50 Mbps أو أكثر | 100 Mbps أو أكثر، ويُفضَّل 1 Gbps |
+
+يحتاج كلاهما إلى Linux، وPHP 8.2 أو أحدث، وMariaDB 10 أو أحدث، وApache 2.4 مع `mod_rewrite` أو Nginx، وشهادة SSL (شهادة Let's Encrypt مجانية)، وامتدادات PHP التالية: bcmath وcurl وgd وintl وmbstring وmysqli وpdo وtokenizer وxml وzip.
+
+FreeRADIUS اختياري ويحتاج إلى VPS أو خادم مخصص خاص به.
+
+## اختر طريقة التثبيت
+
+- [استضافة مشتركة مع cPanel](/ar/docs/getting-started/install-cpanel/)
+- [خادم VPS خاص بك](/ar/docs/getting-started/install-vps/)
+- [جهازك](/ar/docs/getting-started/install-local/)
+
+## التثبيت
+
+1. **ارفع الملفات.** جذر المستودع هو جذر الويب. لا يوجد مجلد `public/`.
+2. **أنشئ قاعدة بيانات فارغة** ومستخدمًا لها.
+3. **افتح `/install`** في المتصفح. يكتب المثبّت الملف `config.php` ويستورد `install/phpnuxbill.sql`.
+4. **سجّل الدخول** بالحساب الذي أنشأته وأضف الراوتر من قائمة *Network*.
+
+> يحتوي `config.php` على بيانات الاتصال بقاعدة البيانات و`APP_URL`. وهو ليس جزءًا من المستودع؛ والقالب هو `config.sample.php`.
+
+## Cron
+
+تنتهي الباقات وتتجدد وتُرسل التذكيرات عبر مهمة cron. بدونها يبقى العملاء متصلين بعد انتهاء باقاتهم.
+
+```bash
+# كل دقيقة: إنهاء الباقات المنتهية وتجديد المستحقة
+* * * * * cd /path/to/site/system && php cron.php
+
+# كل يوم: إرسال التذكيرات
+0 8 * * * cd /path/to/site/system && php cron_reminder.php
+```
+
+مهام أخرى يمكنك إضافتها بالطريقة نفسها:
+
+```bash
+php system/cron/clean_expired_vouchers.php
+php system/cron/cleanup_stale_sessions.php
+php system/cron/marketplace_sync.php
+```
+
+تنبّهك لوحة التحكم عندما لا تعمل مهمة cron لأكثر من 24 ساعة.
+
+## التحديث
+
+بعد رفع إصدار أحدث، افتح `/update.php`. يعيد تنفيذ تعليمات المخطط الجديدة من `system/updates.json` ويكتب `version.json`. خذ نسخة احتياطية من قاعدة البيانات أولًا.
+
+## التطوير المحلي
+
+وجّه خادم PHP محليًا أو مضيفًا افتراضيًا في XAMPP إلى جذر المستودع. عندما لا تكون قيمة `$_app_stage` في `config.php` هي `Live`، تُعرض الأخطاء وتُسجَّل الاستعلامات، وهذا ما تريده على جهاز التطوير لا في الإنتاج.

@@ -1,0 +1,33 @@
+---
+title: Staff roles
+description: What each staff role can see and how to restrict a page to some of them.
+section: using
+order: 2
+---
+Every staff account has one role. The role decides which menu entries appear and which pages open.
+
+| Role | Typical use |
+|---|---|
+| `SuperAdmin` | The owner. Full access, including system settings. |
+| `Admin` | Day-to-day management of customers, plans and routers. |
+| `Report` | Read-only access to reports. |
+| `Agent` | A reseller who sells to their own customers. |
+| `Sales` | Front-desk sales. |
+| `Asset` | Equipment and inventory. |
+| `Support` | Customer support. |
+
+## Dashboard per role
+
+The dashboard layout is stored per role, so a `Support` user can see different widgets from an `Admin`.
+
+## Guarding a page in code
+
+Controllers and plugins check the role inline:
+
+```php
+if (!in_array($admin['user_type'], ['SuperAdmin', 'Admin'])) {
+    _alert(Lang::T('You do not have permission to access this page'), 'danger', 'dashboard');
+}
+```
+
+Menu entries added by plugins take the same list in their `auth` argument. An empty list means everyone.

@@ -1,0 +1,138 @@
+---
+import Base from '../layouts/Base.astro';
+import { loadRepository } from '../data/community';
+import { pages } from '../i18n/pages';
+import { type Lang } from '../i18n';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const P = pages[lang].extensions;
+const repo = await loadRepository();
+// one list with a kind on every entry, newest first within each kind (loadRepository already sorts them)
+const all = [
+  ...repo.plugins.map((x) => ({ ...x, kind: 'plugin' })),
+  ...repo.gateways.map((x) => ({ ...x, kind: 'gateway' })),
+  ...repo.devices.map((x) => ({ ...x, kind: 'device' })),
+];
+const kindLabel: Record<string, string> = { plugin: P.plugins, gateway: P.gateways, device: P.devices };
+const types: [string, string][] = [['all', P.all], ['plugin', P.plugins], ['gateway', P.gateways], ['device', P.devices]];
+const prices: [string, string][] = [['all', P.all], ['free', P.free], ['paid', P.paid]];
+---
+<Base title={P.title} description={P.description}>
+  <div class="mx-auto max-w-6xl px-4 py-12 lg:py-16" data-extensions data-count-template={P.count} data-page-size="12" data-page-label={P.page}>
+    <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">{P.title}</h1>
+    <p class="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{P.intro}</p>
+
+    <div class="mt-10 grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-end">
+      <label class="block">
+        <span class="sr-only">{P.search}</span>
+        <input id="ext-search" type="search" placeholder={P.search} autocomplete="off" class="w-full rounded-md border bg-background px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring" />
+      </label>
+      <div role="group" aria-label={P.type} class="flex flex-wrap gap-2" data-group="type">
+        {types.map(([value, label], i) => (
+          <button type="button" data-value={value} aria-pressed={i === 0 ? 'true' : 'false'} class="chip rounded-full border px-4 py-2 text-sm font-medium hover:bg-accent">{label}</button>
+        ))}
+      </div>
+      <div role="group" aria-label={P.price} class="flex flex-wrap gap-2" data-group="price">
+        {prices.map(([value, label], i) => (
+          <button type="button" data-value={value} aria-pressed={i === 0 ? 'true' : 'false'} class="chip rounded-full border px-4 py-2 text-sm font-medium hover:bg-accent">{label}</button>
+        ))}
+      </div>
+    </div>
+
+    <p id="ext-count" class="mt-6 text-sm text-muted-foreground" aria-live="polite">{P.count.replace('{n}', String(all.length))}</p>
+
+    <ul id="ext-list" class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {all.map((x) => (
+        <li data-kind={x.kind} data-paid={x.paid ? 'paid' : 'free'} data-text={`${x.name} ${x.description} ${x.author}`.toLowerCase()}>
+          <article dir="ltr" class="flex h-full flex-col rounded-xl border bg-card p-5">
+            <div class="flex items-start justify-between gap-3">
+              <h2 class="font-display text-lg font-semibold leading-snug">{x.name}</h2>
+              <span class:list={['mt-0.5 flex-none rounded-full px-2.5 py-0.5 text-xs font-medium', x.paid ? 'bg-sun/20 text-foreground' : 'bg-accent text-brand']}>{x.paid ? P.paid : P.free}</span>
+            </div>
+            <p class="mt-1 text-xs text-muted-foreground">{kindLabel[x.kind]}</p>
+            <p class="mt-3 line-clamp-5 flex-1 text-sm leading-relaxed text-muted-foreground">{x.description || P.empty}</p>
+            <div class="mt-4 flex items-center justify-between gap-3 border-t pt-3 text-sm">
+              <span class="truncate text-muted-foreground">{P.by} {x.author}{x.updated ? ` · ${x.updated}` : ''}</span>
+              {(x.paid ? (x.url || x.github) : (x.github || x.url)) && <a href={x.paid ? (x.url || x.github) : (x.github || x.url)} rel="noopener" class:list={['flex-none font-medium hover:underline', x.paid ? 'rounded-full bg-sun px-3 py-1 text-foreground no-underline hover:opacity-90' : 'text-brand']}>{x.paid ? P.buy : P.view}<span class="sr-only"> {x.name}</span></a>}
+            </div>
+          </article>
+        </li>
+      ))}
+    </ul>
+    <nav id="ext-pages" aria-label={P.pagination} class="mt-8 hidden flex-wrap items-center justify-center gap-2">
+      <button type="button" data-prev class="rounded-full border px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-40">{P.prev}</button>
+      <span data-numbers class="flex flex-wrap items-center justify-center gap-2"></span>
+      <button type="button" data-next class="rounded-full border px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-40">{P.next}</button>
+    </nav>
+    <p id="ext-none" class="mt-8 hidden rounded-lg border p-6 text-center text-muted-foreground">{P.none}</p>
+  </div>
+</Base>
+<script>
+  // Filters and pages the list in the page: nothing is fetched. Without scripting the whole list simply stays visible.
+  const root = document.querySelector<HTMLElement>('[data-extensions]');
+  if (root) {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('#ext-list > li'));
+    const search = root.querySelector<HTMLInputElement>('#ext-search')!;
+    const count = root.querySelector<HTMLElement>('#ext-count')!;
+    const none = root.querySelector<HTMLElement>('#ext-none')!;
+    const nav = root.querySelector<HTMLElement>('#ext-pages')!;
+    const numbers = nav.querySelector<HTMLElement>('[data-numbers]')!;
+    const prev = nav.querySelector<HTMLButtonElement>('[data-prev]')!;
+    const next = nav.querySelector<HTMLButtonElement>('[data-next]')!;
+    const template = root.dataset.countTemplate || '{n}';
+    const pageLabel = root.dataset.pageLabel || '{n}';
+    const size = Number(root.dataset.pageSize) || 12;
+    const state = { type: 'all', price: 'all', page: 1 };
+
+    const apply = (scroll = false) => {
+      const q = search.value.trim().toLowerCase();
+      const matches = items.filter((li) => (state.type === 'all' || li.dataset.kind === state.type)
+        && (state.price === 'all' || li.dataset.paid === state.price)
+        && (!q || (li.dataset.text || '').includes(q)));
+      const pages = Math.max(1, Math.ceil(matches.length / size));
+      state.page = Math.min(Math.max(state.page, 1), pages);
+      const start = (state.page - 1) * size;
+      const visible = new Set(matches.slice(start, start + size));
+      for (const li of items) li.hidden = !visible.has(li);
+      count.textContent = template.replace('{n}', String(matches.length));
+      none.classList.toggle('hidden', matches.length > 0);
+
+      nav.classList.toggle('hidden', pages < 2);
+      nav.classList.toggle('flex', pages > 1);
+      prev.disabled = state.page <= 1;
+      next.disabled = state.page >= pages;
+      numbers.replaceChildren(...Array.from({ length: pages }, (_, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = String(i + 1);
+        b.setAttribute('aria-label', pageLabel.replace('{n}', String(i + 1)));
+        b.setAttribute('aria-pressed', String(i + 1 === state.page));
+        if (i + 1 === state.page) b.setAttribute('aria-current', 'page');
+        b.className = 'chip grid h-10 min-w-10 place-items-center rounded-full border px-3 text-sm font-medium hover:bg-accent';
+        b.addEventListener('click', () => { state.page = i + 1; apply(true); });
+        return b;
+      }));
+      if (scroll) root.querySelector('#ext-count')!.scrollIntoView({ block: 'start' });
+    };
+
+    root.querySelectorAll<HTMLElement>('[data-group]').forEach((group) => {
+      const key = group.dataset.group as 'type' | 'price';
+      group.querySelectorAll<HTMLButtonElement>('button').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state[key] = btn.dataset.value || 'all';
+          state.page = 1;
+          group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+          apply();
+        });
+      });
+    });
+    search.addEventListener('input', () => { state.page = 1; apply(); });
+    prev.addEventListener('click', () => { state.page--; apply(true); });
+    next.addEventListener('click', () => { state.page++; apply(true); });
+
+    // an address such as /extensions/?type=plugin (the old site's plugin page redirects there) starts with that type chosen
+    const wanted = new URLSearchParams(location.search).get('type');
+    const chip = wanted && root.querySelector<HTMLButtonElement>(`[data-group=type] button[data-value="${CSS.escape(wanted)}"]`);
+    if (chip) chip.click(); else apply();
+  }
+</script>

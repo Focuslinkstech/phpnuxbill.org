@@ -1,0 +1,23 @@
+---
+// One docs page in one language. The route files pass the language and the page.
+import { render } from 'astro:content';
+import Docs from '../layouts/Docs.astro';
+import { ui, localePath, type Lang } from '../i18n';
+import { resolveDocs, type ResolvedDoc } from '../i18n/docs';
+import { SITE } from '../site';
+interface Props { lang: Lang; doc: ResolvedDoc; }
+const { lang, doc } = Astro.props;
+const { Content, headings } = await render(doc.entry);
+
+// previous / next in menu order: section order first, then the page order inside the section
+const sectionOrder = Object.keys(ui[lang].sections);
+const ordered = (await resolveDocs(lang)).sort((a, b) =>
+  sectionOrder.indexOf(a.section) - sectionOrder.indexOf(b.section) || a.order - b.order);
+const at = ordered.findIndex((d) => d.slug === doc.slug);
+const link = (d?: ResolvedDoc) => (d ? { title: d.entry.data.title, href: localePath(lang, `/docs/${d.slug}/`) } : undefined);
+const editUrl = doc.entry.filePath ? `${SITE.website}/edit/main/${doc.entry.filePath}` : undefined;
+---
+<Docs title={doc.entry.data.title} description={doc.entry.data.description} section={ui[lang].sections[doc.section]} current={doc.slug}
+  headings={headings} fallback={doc.fallback} prev={link(ordered[at - 1])} next={link(ordered[at + 1])} editUrl={editUrl}>
+  <Content />
+</Docs>

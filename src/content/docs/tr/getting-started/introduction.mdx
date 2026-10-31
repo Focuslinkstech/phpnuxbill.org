@@ -1,0 +1,36 @@
+---
+title: Giriş
+description: PHPNuxBill nedir, kimler için tasarlandı ve parçalar nasıl bir araya gelir.
+section: getting-started
+order: 1
+---
+PHPNuxBill, Mikrotik router kullanan ISS'ler ve hotspot işletmecileri için bir faturalandırma sistemidir. Müşteriler bir paket satın alır, sistem router üzerinde (veya FreeRADIUS içinde) müşterinin hesabını oluşturur ve paket bittiğinde hesabı yeniden kaldırır.
+
+## Neler sunar
+
+- Bir veya birden fazla Mikrotik router üzerinde ya da FreeRADIUS aracılığıyla **Hotspot ve PPPoE paketleri**.
+- **Voucher'lar**: toplu olarak oluşturup yazdırabilir veya müşteri portalı üzerinden satabilirsiniz.
+- Kayıt, bakiye yükleme, paket satın alma ve geçmiş için **bir müşteri portalı**.
+- Yerleşik Marketplace'ten kurulan **ödeme geçitleri**, **cihazlar**, **eklentiler** ve **temalar**.
+- Kendi menüleri olan **personel rolleri**: `SuperAdmin`, `Admin`, `Report`, `Agent`, `Sales`, `Asset` ve `Support`.
+
+## Nasıl geliştirildi
+
+PHPNuxBill, MySQL veritabanı kullanan, framework içermeyen sade bir PHP uygulamasıdır. Deponun kök dizini web kök dizinidir, derleme adımı yoktur ve sayfalar Smarty şablonlarıyla oluşturulur. Bu sayede paylaşımlı bir sunucuda veya Raspberry Pi üzerinde barındırmak kolaydır; bir şeyi değiştirmeniz gerektiğinde de kodu okumak kolaydır.
+
+| Bölüm | Konum |
+|---|---|
+| Sayfalar (controller'lar) | `system/controllers/` |
+| Şablonlar | `ui/ui/` (temalar bunları `ui/themes/` içinden geçersiz kılar) |
+| Eklentiler | `system/plugin/` |
+| Ödeme geçitleri | `system/paymentgateway/` |
+| Cihaz sürücüleri | `system/devices/` |
+| Şema ve migrasyonlar | `install/phpnuxbill.sql` ve `system/updates.json` |
+
+## Sonraki adımlar
+
+1. [Kurulumu yapın](/tr/docs/getting-started/installation/) ve cron görevini ayarlayın.
+2. [Voucher'ların](/tr/docs/using/vouchers/) ve [rollerin](/tr/docs/using/roles/) nasıl çalıştığını öğrenin.
+3. Kod yazıyorsanız [eklenti kılavuzuyla](/tr/docs/extending/plugins/) başlayın.
+
+PHPNuxBill, GNU General Public License sürüm 2 veya üzeri altında özgür bir yazılımdır.

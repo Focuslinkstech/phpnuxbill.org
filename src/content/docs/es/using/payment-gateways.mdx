@@ -1,0 +1,42 @@
+---
+title: Pasarelas de pago
+description: Añade una pasarela de pago, dale la URL de callback y prueba un pago antes de que la usen los clientes.
+section: using
+order: 12
+---
+Una pasarela de pago permite a los clientes pagar un plan en línea. PHPNuxBill activa el plan cuando la pasarela confirma el pago.
+
+## Añadir una pasarela
+
+No hay ninguna pasarela de pago incluida. Todas vienen del [Marketplace](/es/extensions/) o del autor de la pasarela. En el panel de administración, abre el Marketplace, ve a pasarelas de pago e instala una, o sube su paquete.
+
+Después abre **Settings > Payment Gateway**, elige la pasarela y rellena su formulario. Cada pasarela pide sus propias claves. Las pasarelas de pago comerciales también pueden necesitar una clave de licencia, que introduces desde su tarjeta en el Marketplace.
+
+## La URL de callback
+
+La mayoría de las pasarelas avisan a PHPNuxBill de que un pago tuvo éxito llamando a una URL de tu sitio. La dirección es:
+
+```text
+https://your-domain.com/callback/<gateway>
+```
+
+`<gateway>` es el nombre de la pasarela, que es el nombre de su carpeta o archivo. La misma dirección también funciona como `https://your-domain.com/?_route=callback/<gateway>`. Dásela a la pasarela cuando pida una URL de callback, webhook o notificación.
+
+Debe ser accesible desde internet. Una pasarela no puede llamar a `localhost`, a una IP privada ni a una página protegida con inicio de sesión.
+
+## Qué pide una pasarela
+
+La mayoría pide las claves de tu cuenta en el sitio web de la pasarela, como un client ID y una clave secreta, y la moneda en la que cobras. Algunas piden también una URL de callback o webhook, que es la dirección de arriba. La página de la pasarela en el Marketplace indica qué necesita.
+
+## Prueba antes de salir en producción
+
+1. Usa primero las claves de sandbox o de prueba de la pasarela.
+2. Como cliente, compra un plan y paga.
+3. Comprueba que el plan está activo y que la transacción aparece en el panel de administración.
+4. Cambia a las claves reales y haz un pequeño pago real.
+
+Si un pago no activa el plan, sigue [Solución de problemas](/es/docs/using/troubleshooting/#un-cliente-pagó-pero-el-plan-no-se-activó).
+
+## Crea la tuya
+
+Consulta [Pasarelas de pago](/es/docs/extending/gateways/) en la guía de extensión.

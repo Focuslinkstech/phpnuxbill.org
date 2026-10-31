@@ -1,0 +1,68 @@
+---
+title: Connect a router
+description: Add your Mikrotik router, create a plan and test it with a voucher.
+section: getting-started
+order: 7
+---
+This walks through the shortest path from a fresh install to a working sale: add your Mikrotik router, create a plan, then buy it with a voucher as a test customer. It assumes you have finished the [installation](/docs/getting-started/installation/) and can sign in as an administrator.
+
+## 1. Prepare the router
+
+PHPNuxBill talks to a Mikrotik router through the RouterOS API.
+
+- **Turn the API service on.** In WinBox, open *IP > Services* and make sure `api` is enabled. Its default port is `8728`.
+- **Create a user for PHPNuxBill** on the router. A dedicated user is better than `admin`. Full rights are the simplest to start with, and you can restrict them later once you know what your setup needs.
+- **Make sure the server can reach the router** on that port. If PHPNuxBill runs on a remote host, you usually need a firewall rule or a VPN so the API port is reachable from the server, and not from everyone.
+
+## 2. Add the router
+
+Open *Network > Routers* and add one:
+
+| Field | What to enter |
+|---|---|
+| Status | Enable |
+| Router Name / Location | A name you will recognise, for example the place it serves |
+| IP Address | The router's address, with the port if it is not the default: `192.168.88.1` or `192.168.88.1:8728` |
+| Username | The RouterOS user you created |
+| Router Secret | That user's password |
+| Description | Optional, for example the area it covers |
+
+Leave *Test Connection* ticked and save. If the test fails, the message tells you why. The usual causes are the API service being off, the wrong port, a wrong password, or a firewall in between.
+
+## 3. Create a bandwidth profile
+
+Open *Internet Plan > Bandwidth* and add a profile: a name and the download and upload speed. Plans pick one of these, so you can reuse the same speed on several plans.
+
+## 4. Create a plan
+
+Open *Internet Plan > Hotspot* (or *PPPOE*) and add a plan:
+
+- **Active** and **Prepaid**, with **Personal** or **Business** as the plan type.
+- A **Plan Name** customers will see.
+- **Unlimited**, or **Limited** by time, by data, or both.
+- The **Bandwidth** profile from the previous step.
+- The **Package Price**, and how long the plan lasts (**Validity**).
+- The **Router** you added.
+
+Save it. The plan is created on the router for you.
+
+## 5. Test with a voucher
+
+1. Open *Services > Vouchers* and add one voucher for the new plan. The [Vouchers](/docs/using/vouchers/) page explains the form.
+2. Open your customer portal, register a test customer, and enter the code under *Voucher Activation*.
+3. The account is created on the router. Connect a device to the hotspot and sign in to check that it works.
+
+## 6. Set up the cron job
+
+Plans only end on time when the [cron job](/docs/getting-started/installation/) runs. Do it now, before real customers arrive.
+
+## If something goes wrong
+
+| What you see | Check |
+|---|---|
+| *Test Connection* fails | The API service is enabled, the port is right and reachable from the server, and the username and password are correct. |
+| A customer bought a plan but is not online | The plan has the router you expect, the router connection still works, and *Logs* shows no error for that customer. |
+| A plan does not end | The cron job is running. The dashboard warns you when it has not run for 24 hours. |
+| A page shows a blank error | Set `$_app_stage` in `config.php` to something other than `Live` on a test machine to see the real error. |
+
+Still stuck? See [Getting help](/docs/getting-started/getting-help/).

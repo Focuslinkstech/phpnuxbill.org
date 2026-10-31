@@ -1,0 +1,26 @@
+---
+title: Payment gateway
+description: Fungsi yang disediakan sebuah gateway dan cara sistem penagihan memanggilnya.
+section: extending
+order: 11
+---
+Gateway adalah folder `system/paymentgateway/<slug>/` berisi `gateway.json`, `<slug>.php`, dan folder `ui/` (satu file di
+`system/paymentgateway/` juga bisa). Sistem penagihan hanya memuat file gateway saat dibutuhkan: ketika checkout, di halaman
+pengaturan gateway, dan untuk webhook penyedia. Setelah itu ia memanggil fungsi yang namanya mengikuti slug.
+
+| Fungsi | Tugas |
+|---|---|
+| `<slug>_validate_config()` | Sebelum setiap checkout: alihkan dengan pesan jika admin belum mengonfigurasinya. |
+| `<slug>_show_config()` / `<slug>_save_config()` | Halaman pengaturan admin dan POST-nya. Periksa CSRF; pengaturan disimpan di `tbl_appconfig` sebagai `<slug>_*`. |
+| `<slug>_create_transaction($trx, $user)` | Pelanggan memilih gateway: buat pembayaran di penyedia lalu alihkan. |
+| `<slug>_get_status($trx, $user)` | Pelanggan kembali, atau menekan "check payment". |
+| `<slug>_payment_notification()` | Webhook penyedia di `callback/<slug>`: verifikasi tanda tangan, selesaikan pesanan. |
+
+## Aturan yang menghindarkan masalah
+
+- **Penyelesaian harus idempoten.** Polling dan webhook bisa sama-sama datang untuk pesanan yang sama.
+- **Tentukan file dengan `GatewayLoader::file($slug)`**, jangan pernah menggabungkan path sendiri.
+- **Template** ditaruh di `ui/<slug>.tpl` dan dirujuk sebagai `<slug>.tpl` biasa atau `pg:<slug>.tpl`.
+- **Gateway dengan error PHP**, persyaratan yang belum terpenuhi, atau lisensi yang hilang tidak dapat diaktifkan.
+
+Kontrak lengkap, dengan kode status dan catatan keamanan webhook, ada di `gateway/README.md` pada starter.

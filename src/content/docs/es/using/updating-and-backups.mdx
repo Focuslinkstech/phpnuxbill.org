@@ -1,0 +1,49 @@
+---
+title: Actualizaciones y copias de seguridad
+description: Haz una copia de seguridad, actualiza a una versión nueva y vuelve atrás si algo sale mal.
+section: using
+order: 11
+---
+Haz una copia de seguridad antes de cada actualización. Una actualización modifica la base de datos, y la copia de seguridad es el único camino de vuelta.
+
+## Qué respaldar
+
+| Qué | Por qué |
+|---|---|
+| La base de datos | Clientes, planes, transacciones y ajustes. |
+| `config.php` | Credenciales de la base de datos y `APP_URL`. No viene en la descarga. |
+| `system/uploads/` | Logotipos, archivos subidos y ajustes guardados como archivos. |
+| Todo lo que hayas añadido | Plugins en `system/plugin/`, pasarelas en `system/paymentgateway/`, y temas o plantillas personalizados en `ui/`. |
+
+### La base de datos
+
+La forma fiable es un volcado desde el servidor:
+
+```bash
+mysqldump -u phpnuxbilluser -p phpnuxbill > phpnuxbill-$(date +%F).sql
+```
+
+En **Settings > Backup/Restore**, un SuperAdmin también puede descargar tablas elegidas como archivo JSON y subir uno para restaurar. Es útil para mover datos, pero úsalo con cuidado: una restauración **vacía cada tabla del archivo antes de cargarla**. No lo uses como tu única copia de seguridad y prueba primero la restauración en una copia.
+
+## Actualizar
+
+1. Haz las copias de seguridad anteriores.
+2. Sube la nueva versión sobre la anterior. Conserva tu `config.php`, `system/uploads/` y las carpetas que añadiste.
+3. Abre `/update.php` en el navegador. Ejecuta los nuevos cambios de la base de datos desde `system/updates.json` y registra la versión en `version.json`.
+4. Elimina los archivos dentro de `ui/compiled/` y `ui/cache/`.
+5. Inicia sesión y revisa el panel, la página de un cliente y el widget del cron.
+
+Lee antes las [notas de la versión](/es/changelog/). Explican qué cambió.
+
+## Volver atrás
+
+1. Restaura los archivos antiguos.
+2. Restaura la base de datos desde tu volcado:
+
+   ```bash
+   mysql -u phpnuxbilluser -p phpnuxbill < phpnuxbill-2026-01-01.sql
+   ```
+
+3. Limpia `ui/compiled/` y `ui/cache/`.
+
+No ejecutes una versión anterior sobre una base de datos más reciente sin restaurar el volcado. El código antiguo no conoce las columnas nuevas.

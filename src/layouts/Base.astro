@@ -1,0 +1,69 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ScrollTop from '../components/ScrollTop.astro';
+import { LANGUAGES, DEFAULT_LANG, dirOf, localePath, stripLocale, type Lang } from '../i18n';
+import { landing } from '../i18n/landing';
+
+interface Props { title?: string; description?: string; }
+const lang = (Astro.currentLocale ?? DEFAULT_LANG) as Lang;
+const home = landing[lang];
+const { title, description = home.description } = Astro.props;
+const fullTitle = title ? `${title} · PHPNuxBill` : home.title;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = stripLocale(Astro.url.pathname);
+const abs = (l: Lang) => new URL(localePath(l, path), Astro.site).href;
+---
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href={`${base}/favicon.png`} />
+    <link rel="apple-touch-icon" href={`${base}/favicon.png`} />
+    <link rel="canonical" href={abs(lang)} />
+    <link rel="alternate" type="application/rss+xml" title="PHPNuxBill release notes" href={`${base}/rss.xml`} />
+    {LANGUAGES.map((l) => <link rel="alternate" hreflang={l.code} href={abs(l.code)} />)}
+    <link rel="alternate" hreflang="x-default" href={abs(DEFAULT_LANG)} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={lang} />
+    <meta property="og:image" content={new URL(`${base}/og.png`, Astro.site)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- Set the theme before first paint so the page never flashes the wrong one. The mode is "system" (the default, follows the
+         operating system and changes with it), "light" or "dark"; the toggle in the header cycles through them. -->
+    <script is:inline>
+      (function () {
+        var mq = matchMedia('(prefers-color-scheme: dark)');
+        function mode() {
+          try { var m = localStorage.getItem('theme'); if (m === 'light' || m === 'dark') return m; } catch (e) {}
+          return 'system';
+        }
+        function apply() {
+          var m = mode();
+          var dark = m === 'dark' || (m === 'system' && mq.matches);
+          document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.dataset.mode = m;
+        }
+        window.__setThemeMode = function (m) {
+          try { if (m === 'system') localStorage.removeItem('theme'); else localStorage.setItem('theme', m); } catch (e) {}
+          apply();
+        };
+        window.__themeMode = mode;
+        apply();
+        mq.addEventListener('change', apply);
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <Header />
+    <main class="flex-1"><slot /></main>
+    <Footer />
+    <ScrollTop />
+  </body>
+</html>

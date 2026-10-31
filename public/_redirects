@@ -1,0 +1,26 @@
+# Cloudflare Pages: permanent redirects from the old Nuxt site's addresses (the built site also has HTML fallbacks for these)
+/ultimate /  301
+/getting-started/introduction /docs/getting-started/introduction/  301
+/getting-started/how-its-works /docs/getting-started/how-it-works/  301
+/getting-started/installation /docs/getting-started/install-cpanel/  301
+/getting-started/installation/requirements /docs/getting-started/installation/  301
+/getting-started/installation/vps /docs/getting-started/install-vps/  301
+/getting-started/installation/local /docs/getting-started/install-local/  301
+/getting-started/installation/docker /docs/getting-started/installation/  301
+/extensions/plugins /extensions/?type=plugin  301
+/extensions/payment-gateways /extensions/?type=gateway  301
+/extensions/devices /extensions/?type=device  301
+/extensions/themes /extensions/  301
+/extensions/introduction /extensions/  301
+/id/getting-started/introduction /id/docs/getting-started/introduction/  301
+/id/getting-started/how-its-works /id/docs/getting-started/how-it-works/  301
+/id/getting-started/installation /id/docs/getting-started/install-cpanel/  301
+/id/getting-started/installation/requirements /id/docs/getting-started/installation/  301
+/id/getting-started/installation/vps /id/docs/getting-started/install-vps/  301
+/id/getting-started/installation/local /id/docs/getting-started/install-local/  301
+/id/getting-started/installation/docker /id/docs/getting-started/installation/  301
+/id/extensions/plugins /id/extensions/?type=plugin  301
+/id/extensions/payment-gateways /id/extensions/?type=gateway  301
+/id/extensions/devices /id/extensions/?type=device  301
+/id/extensions/themes /id/extensions/  301
+/id/extensions/introduction /id/extensions/  301

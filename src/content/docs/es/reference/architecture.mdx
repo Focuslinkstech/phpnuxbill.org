@@ -1,0 +1,38 @@
+---
+title: Arquitectura
+description: Cómo recorre una petición la aplicación y las convenciones que sigue el código.
+section: reference
+order: 1
+---
+## Ciclo de una petición
+
+```
+index.php  →  system/vendor/autoload.php
+           →  system/boot.php
+                 →  init.php   (autoloader, config.php, base de datos, plugins, ajustes)
+                 →  Smarty como $ui, carpetas de plantillas
+                 →  $routes = explode('/', $_GET['_route'])
+                 →  system/controllers/{$routes[0]}.php
+```
+
+La regla de reescritura envía cualquier ruta que no sea un archivo a `index.php?_route=$1`, así que `/customers/edit/5` y `?_route=customers/edit/5` son la misma petición. `$routes[1]` es la acción y `$routes[2]` el id.
+
+`system/api.php` es un segundo punto de entrada. Ejecuta los mismos controladores pero devuelve las variables asignadas como JSON, por eso los controladores usan `$ui->assign()`, `r2()` y `showResult()` en lugar de imprimir.
+
+## Convenciones
+
+| Tema | Convención |
+|---|---|
+| Clases | Sin espacios de nombres. `Foo` se carga desde `system/autoload/Foo.php`. |
+| Base de datos | Idiorm: `ORM::for_table('tbl_customers')->where(...)->find_one()`. |
+| Cambios de esquema | Añádelos a `install/phpnuxbill.sql` y como nueva clave de versión en `system/updates.json`. |
+| Autenticación | `_admin()` para páginas del personal, `_auth()` para páginas del cliente. |
+| Entrada | `_post()`, `_get()`, `_req()` solo recortan espacios. No escapan. |
+| CSRF | Genéralo con `Csrf::generateAndStoreToken()` y compruébalo con `Csrf::check()` antes de cambiar datos. |
+| Redirecciones | `r2(getUrl('path'), 's' o 'e' o 'w', Lang::T('Message'))`. |
+| Traducción | `Lang::T('English string')`, respaldado por `system/lan/*.json`. |
+| Registro | `_log($description, $type, $userid)` escribe en `tbl_logs`. |
+
+## Puntos de extensión
+
+Los plugins registran menús, rutas y hooks (`register_menu()`, `register_route()`, `register_hook()`). Los controladores llaman a `run_hook('name')` donde un plugin puede añadir contenido a la página. Las pasarelas de pago, dispositivos y widgets se cargan por nombre desde sus propias carpetas. Consulta [Tipos de extensión](/es/docs/extending/overview/).

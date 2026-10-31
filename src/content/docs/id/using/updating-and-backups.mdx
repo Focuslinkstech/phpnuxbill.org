@@ -1,0 +1,49 @@
+---
+title: Pembaruan dan cadangan
+description: Buat cadangan, perbarui ke versi baru, dan kembalikan jika ada yang salah.
+section: using
+order: 11
+---
+Buat cadangan sebelum setiap pembaruan. Pembaruan mengubah database, dan cadangan adalah satu-satunya jalan kembali.
+
+## Yang perlu dicadangkan
+
+| Apa | Mengapa |
+|---|---|
+| Database | Pelanggan, paket, transaksi, dan pengaturan. |
+| `config.php` | Login database dan `APP_URL`. File ini tidak ada di unduhan. |
+| `system/uploads/` | Logo, unggahan, dan pengaturan yang disimpan sebagai file. |
+| Apa pun yang Anda tambahkan | Plugin di `system/plugin/`, gateway di `system/paymentgateway/`, serta tema atau template kustom di `ui/`. |
+
+### Database
+
+Cara yang dapat diandalkan adalah dump dari server:
+
+```bash
+mysqldump -u phpnuxbilluser -p phpnuxbill > phpnuxbill-$(date +%F).sql
+```
+
+Di **Settings > Backup/Restore**, SuperAdmin juga dapat mengunduh tabel pilihan sebagai file JSON dan mengunggah satu file untuk memulihkan. Ini praktis untuk memindahkan data, tetapi gunakan dengan hati-hati: pemulihan **mengosongkan setiap tabel di dalam file sebelum memuatnya**. Jangan jadikan ini satu-satunya cadangan, dan coba pemulihan pada salinan terlebih dahulu.
+
+## Perbarui
+
+1. Buat cadangan di atas.
+2. Unggah versi baru menimpa versi lama. Pertahankan `config.php`, `system/uploads/`, dan folder yang Anda tambahkan.
+3. Buka `/update.php` di browser. Halaman itu menjalankan perubahan database baru dari `system/updates.json` dan mencatat versinya di `version.json`.
+4. Hapus file di dalam `ui/compiled/` dan `ui/cache/`.
+5. Masuk dan periksa dasbor, halaman pelanggan, dan widget cron.
+
+Baca [catatan rilis](/id/changelog/) terlebih dahulu. Isinya menjelaskan apa yang berubah.
+
+## Kembalikan
+
+1. Pasang kembali file lama.
+2. Pulihkan database dari dump Anda:
+
+   ```bash
+   mysql -u phpnuxbilluser -p phpnuxbill < phpnuxbill-2026-01-01.sql
+   ```
+
+3. Bersihkan `ui/compiled/` dan `ui/cache/`.
+
+Jangan menjalankan versi lama pada database yang lebih baru tanpa memulihkan dump. Kode lama tidak mengenal kolom-kolom baru.

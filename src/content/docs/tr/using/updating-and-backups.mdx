@@ -1,0 +1,49 @@
+---
+title: Güncelleme ve yedekler
+description: Yedek alın, yeni bir sürüme güncelleyin ve bir şeyler ters giderse geri dönün.
+section: using
+order: 11
+---
+Her güncellemeden önce yedek alın. Güncelleme veritabanını değiştirir ve geri dönmenin tek yolu yedektir.
+
+## Nelerin yedeği alınmalı
+
+| Ne | Neden |
+|---|---|
+| Veritabanı | Müşteriler, paketler, işlemler ve ayarlar. |
+| `config.php` | Veritabanı giriş bilgileri ve `APP_URL`. İndirmenin içinde değildir. |
+| `system/uploads/` | Logolar, yüklemeler ve dosya olarak saklanan ayarlar. |
+| Eklediğiniz her şey | `system/plugin/` içindeki eklentiler, `system/paymentgateway/` içindeki ödeme geçitleri ve `ui/` içindeki özel temalar veya şablonlar. |
+
+### Veritabanı
+
+Güvenilir yol, sunucudan alınan bir dökümdür:
+
+```bash
+mysqldump -u phpnuxbilluser -p phpnuxbill > phpnuxbill-$(date +%F).sql
+```
+
+**Settings > Backup/Restore** altında SuperAdmin, seçilen tabloları JSON dosyası olarak indirebilir ve geri yüklemek için bir dosya yükleyebilir. Veri taşımak için kullanışlıdır, ancak dikkatli kullanın: geri yükleme, **dosyadaki her tabloyu yüklemeden önce boşaltır**. Tek yedeğiniz olarak kullanmayın ve geri yüklemeyi önce bir kopyada deneyin.
+
+## Güncelleme
+
+1. Yukarıdaki yedekleri alın.
+2. Yeni sürümü eskisinin üzerine yükleyin. `config.php` dosyanızı, `system/uploads/` klasörünü ve eklediğiniz klasörleri koruyun.
+3. Tarayıcınızda `/update.php` adresini açın. `system/updates.json` içindeki yeni veritabanı değişikliklerini çalıştırır ve sürümü `version.json` dosyasına kaydeder.
+4. `ui/compiled/` ve `ui/cache/` içindeki dosyaları silin.
+5. Oturum açın ve gösterge panelini, bir müşteri sayfasını ve cron widget'ını kontrol edin.
+
+Önce [sürüm notlarını](/tr/changelog/) okuyun. Nelerin değiştiğini anlatırlar.
+
+## Geri dönme
+
+1. Eski dosyaları geri koyun.
+2. Veritabanını dökümünüzden geri yükleyin:
+
+   ```bash
+   mysql -u phpnuxbilluser -p phpnuxbill < phpnuxbill-2026-01-01.sql
+   ```
+
+3. `ui/compiled/` ve `ui/cache/` klasörlerini temizleyin.
+
+Dökümü geri yüklemeden eski bir sürümü yeni bir veritabanıyla çalıştırmayın. Eski kod yeni sütunları tanımaz.

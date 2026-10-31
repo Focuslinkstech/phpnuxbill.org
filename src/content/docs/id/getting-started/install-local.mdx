@@ -1,0 +1,34 @@
+---
+title: Pasang di komputer Anda
+description: Menjalankan PHPNuxBill secara lokal di macOS atau Windows untuk mencoba atau mengembangkan.
+section: getting-started
+order: 6
+---
+Instalasi lokal mengikuti langkah yang sama seperti instalasi lainnya. Yang berbeda hanya cara mendapatkan PHP dan MySQL.
+
+## macOS
+
+1. Pasang [Homebrew](https://brew.sh/).
+2. Pasang PHP dan database:
+
+   ```bash
+   brew install php composer
+   brew install mariadb   # atau: brew install mysql
+   ```
+
+3. Jalankan server bawaan PHP dari folder PHPNuxBill:
+
+   ```bash
+   php -S localhost:8000
+   ```
+
+   Server bawaan tidak membaca `.htaccess`, jadi URL yang rapi memerlukan Apache atau Nginx. Membuka `/index.php?_route=...` bisa tanpa itu.
+
+## Windows
+
+1. Pasang [XAMPP](https://www.apachefriends.org/index.html) atau [Laragon](https://laragon.org/).
+2. Jalankan Apache dan MySQL dari panel kontrol.
+3. Taruh file PHPNuxBill di `htdocs` (XAMPP) atau `www` (Laragon).
+4. Buka `http://localhost/folder-anda` dan jalankan installer.
+
+Cron job lebih sulit dijadwalkan di Windows. Pakai Task Scheduler, atau mesin Linux untuk keperluan selain mencoba.

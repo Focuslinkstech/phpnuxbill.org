@@ -1,0 +1,25 @@
+---
+title: Nasıl çalışır
+description: "Voucher'lar, giriş şablonu ve bir müşterinin Mikrotik giriş sayfasından çevrimiçi olmaya kadar izlediği yol."
+section: getting-started
+order: 2
+---
+PHPNuxBill ilk olarak voucher satmak için geliştirildi. Voucher'ları PHPNuxBill'de oluşturur ve müşterilere satarsınız. Voucher hiçbir zaman Mikrotik'e girmez. Bunun yerine router üzerindeki bir giriş şablonu, müşterileri kayıt olmaları için PHPNuxBill'e yönlendirir. Müşteri bir voucher satın alır, kayıt olur ve voucher'ı PHPNuxBill'de etkinleştirir. Ardından PHPNuxBill müşteriyi Mikrotik'e ekler ve müşteri, router'ın giriş sayfasında PHPNuxBill hesabıyla oturum açar.
+
+Ödeme geçitleri ve kolay kayıt bunu değiştirdi. Voucher'lar artık birçok seçenekten yalnızca biridir: müşteriler PHPNuxBill içinde doğrudan ödeme geçidinden paket satın alabilir.
+
+## Voucher
+
+![Yazdırılmış bir voucher](/img/voucher.jpg)
+
+## Giriş şablonu
+
+[Mikrotik giriş şablonu](https://github.com/hotspotbilling/phpnuxbill-mikrotik-login-template), müşterileri router'ın giriş sayfasından PHPNuxBill'e yönlendirir.
+
+## Topoloji
+
+![Router, PHPNuxBill ve müşteriler nasıl bağlanır](/img/topology.jpg)
+
+## Akış şeması
+
+![Giriş sayfasından çevrimiçi olmaya](/img/flow-chart.jpg)

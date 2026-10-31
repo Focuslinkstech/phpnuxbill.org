@@ -1,0 +1,77 @@
+---
+title: Instalasi
+description: Persyaratan, installer web, dan cron job yang menjaga paket berakhir tepat waktu.
+section: getting-started
+order: 3
+---
+## Persyaratan
+
+| Dibutuhkan | Catatan |
+|---|---|
+| PHP 8.2 atau lebih baru | dengan ekstensi PDO dan MySQLi |
+| MySQL | database tempat installer mengimpor data |
+| GD2, cURL, ZIP, mbstring | ekstensi PHP |
+| Web server | Apache dengan `mod_rewrite`, atau server apa pun yang mengarahkan path tak dikenal ke `index.php` |
+
+Linux disarankan. Windows bisa dipakai, tetapi menjadwalkan cron job di sana lebih sulit.
+
+PHPNuxBill juga bisa berjalan di Raspberry Pi.
+
+### Untuk produksi
+
+| | Disarankan | Performa lebih baik |
+|---|---|---|
+| Server | VPS atau server dedicated | VPS atau server dedicated |
+| CPU | 1 GHz atau lebih cepat | Quad core, 3 GHz atau lebih cepat |
+| RAM | 1 GB atau lebih | 6 GB atau lebih |
+| Disk | 10 GB atau lebih | 200 GB atau lebih |
+| Jaringan | 50 Mbps atau lebih | 100 Mbps atau lebih, disarankan 1 Gbps |
+
+Keduanya memerlukan Linux, PHP 8.2 atau lebih baru, MariaDB 10 atau lebih baru, Apache 2.4 dengan `mod_rewrite` atau Nginx, sertifikat SSL (Let's Encrypt gratis), dan ekstensi PHP berikut: bcmath, curl, gd, intl, mbstring, mysqli, pdo, tokenizer, xml, dan zip.
+
+FreeRADIUS bersifat opsional dan memerlukan VPS atau server dedicated sendiri.
+
+## Pilih cara memasang
+
+- [Shared hosting dengan cPanel](/id/docs/getting-started/install-cpanel/)
+- [VPS Anda sendiri](/id/docs/getting-started/install-vps/)
+- [Komputer Anda](/id/docs/getting-started/install-local/)
+
+## Pasang
+
+1. **Unggah file.** Root repositori adalah web root. Tidak ada folder `public/`.
+2. **Buat database kosong** dan satu pengguna untuknya.
+3. **Buka `/install`** di browser. Installer menulis `config.php` dan mengimpor `install/phpnuxbill.sql`.
+4. **Masuk** dengan akun yang Anda buat dan tambahkan router Anda di menu *Network*.
+
+> `config.php` berisi kredensial database dan `APP_URL`. File ini bukan bagian dari repositori; `config.sample.php` adalah templatenya.
+
+## Cron
+
+Paket dikedaluwarsakan dan diperpanjang, dan pengingat dikirim, oleh sebuah cron job. Tanpanya pelanggan tetap online setelah paketnya berakhir.
+
+```bash
+# setiap menit: kedaluwarsakan dan perpanjang pelanggan
+* * * * * cd /path/to/site/system && php cron.php
+
+# setiap hari: kirim pengingat
+0 8 * * * cd /path/to/site/system && php cron_reminder.php
+```
+
+Tugas lain yang bisa ditambahkan dengan cara yang sama:
+
+```bash
+php system/cron/clean_expired_vouchers.php
+php system/cron/cleanup_stale_sessions.php
+php system/cron/marketplace_sync.php
+```
+
+Dasbor memberi peringatan bila cron job tidak berjalan lebih dari 24 jam.
+
+## Memperbarui
+
+Setelah mengunggah versi baru, buka `/update.php`. Halaman itu menjalankan ulang pernyataan skema baru dari `system/updates.json` dan menulis `version.json`. Buat cadangan database terlebih dahulu.
+
+## Pengembangan lokal
+
+Arahkan server PHP lokal atau virtual host XAMPP ke root repositori. Bila `$_app_stage` di `config.php` bukan `Live`, galat ditampilkan dan query dicatat. Itu yang Anda inginkan di mesin pengembangan, bukan di produksi.

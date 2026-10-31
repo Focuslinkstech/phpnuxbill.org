@@ -1,0 +1,38 @@
+---
+title: Template login hotspot
+description: Pasang template login PHPNuxBill di hotspot Mikrotik agar pelanggan diarahkan ke portal Anda.
+section: getting-started
+order: 8
+---
+Pelanggan hotspot pertama-tama melihat halaman login dari router. Template login menggantikan halaman itu, sehingga pelanggan diarahkan ke portal PHPNuxBill Anda untuk mendaftar, membeli paket, dan masuk. Template ini diperlukan untuk paket hotspot. Pelanggan PPPoE tidak memakainya.
+
+## Pasang
+
+1. Unduh [template login](https://github.com/hotspotbilling/phpnuxbill-mikrotik-login-template).
+2. Buka `login.html`, `status.html`, dan `logout.html`. Cari `TODO` di tiap file dan ikuti petunjuknya. File-file itu meminta alamat situs PHPNuxBill Anda.
+3. Hapus `errors.txt`, lalu ganti nama `errors.en.txt` menjadi `errors.txt`.
+4. Ganti `background.jpg` dengan gambar Anda sendiri.
+5. Hapus folder `remove_me`.
+6. Unggah semuanya ke folder `hotspot` di router, dan timpa file yang sudah ada. Gunakan WinBox, *Files*.
+
+## Tambahkan situs Anda ke walled garden
+
+Pelanggan belum masuk, jadi router memblokir semuanya. Tambahkan domain atau alamat IP PHPNuxBill Anda ke **walled garden** hotspot (*IP > Hotspot > Walled Garden*). Tanpa ini pelanggan diarahkan ke portal Anda tetapi halamannya tidak pernah termuat. Tambahkan juga domain yang dipakai payment gateway Anda, atau halaman pembayaran tidak akan terbuka.
+
+## Apa yang diterima portal
+
+Saat router mengarahkan pelanggan ke PHPNuxBill, router menyertakan data pelanggan. PHPNuxBill memeriksa masing-masing dan menyimpannya selama kunjungan:
+
+| Nilai | Arti |
+|---|---|
+| `nux-mac` | Alamat MAC pelanggan |
+| `nux-ip` | Alamat IP pelanggan |
+| `nux-router` | Nama router |
+| `nux-key` | Data CHAP untuk memasukkan pelanggan |
+| `nux-hostname` | Nama perangkat pelanggan |
+
+Dengan cara inilah pelanggan yang baru membayar dimasukkan di router yang benar tanpa mengetik apa pun.
+
+## Periksa
+
+Sambungkan ponsel ke hotspot dan buka halaman web apa saja. Anda seharusnya masuk ke portal Anda. Jika yang tampil masih halaman lama router, berarti file belum tertimpa. Jika halaman tidak pernah termuat, periksa walled garden.

@@ -1,0 +1,30 @@
+---
+title: FreeRADIUS
+description: Using FreeRADIUS instead of, or alongside, direct RouterOS accounts.
+section: using
+order: 3
+---
+Besides creating accounts straight on a Mikrotik router, PHPNuxBill can drive FreeRADIUS. Pick the device type on each plan.
+
+## Requirements
+
+FreeRADIUS needs a **VPS or a dedicated server**. It is a system service that you install and run as root, and it must be reachable from your routers, so shared hosting and most control-panel plans cannot run it. If you only have shared hosting, use the Mikrotik device types instead.
+
+| Device | What it does |
+|---|---|
+| `Radius` | RADIUS with MySQL/MariaDB as the database. |
+| `RadiusRest` | Handles the RADIUS connection through a REST API. |
+| `RadiusALE` | The same, for Alcatel-Lucent Enterprise devices. |
+| `RadiusChillispot` | Hotspot vouchers with ChilliSpot on OpenWrt and RADIUS MySQL. |
+
+## REST endpoint
+
+`radius.php` in the site root is the FreeRADIUS `rlm_rest` endpoint. It answers `authorize`, `authenticate` and `accounting`
+requests and tells them apart by the `X-FreeRADIUS-Section` header.
+
+## Database connection
+
+When RADIUS support is on, the application opens a second database connection named `radius` for the RADIUS tables
+(`rad_acct` and related tables, defined in `install/radius.sql`).
+
+See the [FreeRADIUS wiki page](https://github.com/hotspotbilling/phpnuxbill/wiki/FreeRadius) for the FreeRADIUS server side.

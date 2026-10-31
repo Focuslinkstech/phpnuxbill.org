@@ -1,0 +1,28 @@
+---
+title: FreeRADIUS
+description: استخدام FreeRADIUS بدلًا من حسابات RouterOS المباشرة أو معها.
+section: using
+order: 3
+---
+إلى جانب إنشاء الحسابات مباشرة على راوتر Mikrotik، يستطيع PHPNuxBill التحكم في FreeRADIUS. اختر نوع الجهاز في كل باقة.
+
+## المتطلبات
+
+يحتاج FreeRADIUS إلى **VPS أو خادم مخصص**. فهو خدمة نظام تثبّتها وتشغّلها بصلاحيات root، ويجب أن يكون الوصول إليه ممكنًا من الراوترات لديك، لذلك لا تستطيع الاستضافة المشتركة ومعظم باقات لوحات التحكم تشغيله. إذا كانت لديك استضافة مشتركة فقط، فاستخدم أنواع أجهزة Mikrotik بدلًا من ذلك.
+
+| الجهاز | وظيفته |
+|---|---|
+| `Radius` | RADIUS مع MySQL/MariaDB كقاعدة بيانات. |
+| `RadiusRest` | يدير اتصال RADIUS عبر واجهة REST. |
+| `RadiusALE` | الشيء نفسه لأجهزة Alcatel-Lucent Enterprise. |
+| `RadiusChillispot` | قسائم هوت سبوت مع ChilliSpot على OpenWrt وRADIUS MySQL. |
+
+## نقطة REST
+
+الملف `radius.php` في جذر الموقع هو نقطة `rlm_rest` الخاصة بـ FreeRADIUS. يجيب على طلبات `authorize` و`authenticate` و`accounting` ويميّز بينها عبر الترويسة `X-FreeRADIUS-Section`.
+
+## الاتصال بقاعدة البيانات
+
+عند تفعيل دعم RADIUS يفتح التطبيق اتصالًا ثانيًا بقاعدة البيانات اسمه `radius` لجداول RADIUS (`rad_acct` وما يرتبط بها، المعرّفة في `install/radius.sql`).
+
+راجع [صفحة FreeRADIUS في الويكي](https://github.com/hotspotbilling/phpnuxbill/wiki/FreeRadius) لجانب خادم FreeRADIUS.

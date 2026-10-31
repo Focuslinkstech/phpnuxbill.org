@@ -1,0 +1,39 @@
+---
+title: Driver perangkat
+description: Satu class yang membuat dan menghapus akun pelanggan di router atau perangkat lain.
+section: extending
+order: 12
+---
+Driver adalah satu class. Mesin penagihan membuatnya tanpa argumen constructor (`new $plan['device']`), jadi nama class harus
+sama dengan nama file atau foldernya. Paket memilih driver-nya di formulir paket.
+
+| Method | Dipanggil saat |
+|---|---|
+| `description()` | Daftar perangkat membutuhkan judul, penulis, dan tautan. |
+| `add_customer($customer, $plan)` / `remove_customer($customer, $plan)` | Pelanggan diaktifkan atau kedaluwarsa. |
+| `change_username($plan, $from, $to)` | Username berubah. |
+| `add_plan($plan)` / `update_plan($old_name, $plan)` / `remove_plan($plan)` | Paket dibuat, diedit, atau dihapus. |
+| `connect_customer(...)` / `online_customer(...)` / `disconnect_customer(...)` | Login, status, dan logout hotspot. |
+| `sync_customer($customer, $plan)` | Opsional. Mengirim ulang pelanggan aktif ke perangkat. |
+
+Biarkan method yang tidak dipakai kosong, jangan dihapus.
+
+```php
+class AcmeRouter
+{
+    public function description()
+    {
+        return ['title' => 'Acme Router', 'description' => 'Drives Acme routers.', 'author' => 'You'];
+    }
+
+    public function add_customer($customer, $plan)
+    {
+        $device = ORM::for_table('tbl_routers')->where('name', $plan['routers'])->find_one();
+        // call the device with $customer['username'], $customer['password'], $plan['name_plan']
+    }
+}
+```
+
+Driver bawaan (`MikrotikHotspot`, `MikrotikPppoe`, `MikrotikStatic`, `MikrotikVpn`, `Radius`, `RadiusALE`, `RadiusChillispot`,
+`RadiusRest`, `Voucher`, `Dummy`) tidak dapat diganti lewat unggahan, dan driver yang masih dipakai paket tidak dapat dihapus.
+Jangan menyentuh perangkat sungguhan saat `$_app_stage` bernilai `Demo`.

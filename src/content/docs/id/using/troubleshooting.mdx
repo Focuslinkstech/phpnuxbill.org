@@ -1,0 +1,67 @@
+---
+title: Pemecahan masalah
+description: Solusi untuk masalah yang paling sering dialami, dari cron yang tidak berjalan sampai pembayaran yang tidak mengaktifkan paket.
+section: using
+order: 10
+---
+Mulailah dari gejala yang Anda lihat.
+
+## Pelanggan tetap online setelah paketnya berakhir
+
+Cron job tidak berjalan. Paket dikedaluwarsakan dan diperpanjang oleh `system/cron.php`, jadi tanpa itu tidak ada yang berakhir.
+
+1. Buka dasbor. Widget cron menampilkan kapan job terakhir berjalan, dan memberi peringatan setelah 24 jam.
+2. Jalankan job secara manual dari folder `system` dan baca keluarannya:
+
+   ```bash
+   cd /path/to/site/system && php cron.php
+   ```
+
+3. Jika itu berhasil tetapi jadwalnya tidak, periksa baris crontab dari [Instalasi](/id/docs/getting-started/installation/#cron). Penyebab yang paling umum adalah path PHP yang salah. Cari path Anda dengan `which php`.
+4. Jika Anda tidak bisa menjadwalkan job CLI (sebagian shared hosting), `cron.php` juga dapat dipanggil lewat HTTP dari penjadwal eksternal.
+
+## Halaman kosong atau error 500
+
+1. Pastikan PHP versi 8.2 atau lebih baru dan ekstensi PDO, MySQLi, GD, cURL, ZIP, dan mbstring aktif.
+2. Baca log error web server. Log itu menyebutkan file dan barisnya.
+3. Untuk menampilkan error di browser pada mesin uji, atur `$_app_stage` di `config.php` ke nilai selain `Live`. Kembalikan setelahnya, karena pengaturan itu juga menampilkan error kepada pelanggan Anda.
+4. Error yang tidak tertangkap ditampilkan di halaman error, jadi halaman yang nyaris kosong biasanya berarti ada error, bukan berarti tidak terjadi apa-apa.
+
+## Semua halaman selain beranda menampilkan 404
+
+URL yang rapi memerlukan rewriting.
+
+- **Apache:** aktifkan `mod_rewrite` dan atur `AllowOverride All` untuk situs, agar `.htaccess` di root terbaca.
+- **Nginx:** arahkan setiap path yang bukan file ke `index.php?_route=$1`.
+
+Untuk memastikan inilah masalahnya, buka `index.php?_route=login`. Jika itu berfungsi, penyebabnya adalah rewriting.
+
+## "Permission denied", atau pengaturan yang tidak tersimpan
+
+Web server harus bisa menulis ke `system/uploads/`, `system/cache/`, `ui/compiled/`, `ui/cache/`, dan `system/lan/`.
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+```
+
+Penggunanya `www-data` di Debian dan Ubuntu. Di sistem lain bisa jadi `apache` atau `nginx`.
+
+## Tampilan halaman tampak usang setelah pembaruan
+
+Template dikompilasi dan di-cache. Hapus file di dalam `ui/compiled/` dan `ui/cache/` (biarkan foldernya), lalu muat ulang. Lakukan juga hard refresh pada browser agar stylesheet yang di-cache dibuang.
+
+## Router tidak mau terhubung
+
+Lihat [Hubungkan router](/id/docs/getting-started/connect-a-router/). Pastikan layanan API aktif di router, tidak ada aturan firewall yang memblokir port API dari server, dan pengguna router dapat memakai API.
+
+## Pelanggan sudah membayar tetapi paket tidak aktif
+
+Gateway tidak dapat menjangkau PHPNuxBill, atau PHPNuxBill tidak dapat mengonfirmasi pembayaran.
+
+1. Periksa URL callback yang Anda berikan ke gateway. Lihat [Payment gateway](/id/docs/using/payment-gateways/#url-callback).
+2. Pastikan situs berada di alamat publik dengan HTTPS. Gateway tidak dapat memanggil `localhost` atau IP privat.
+3. Buka audit payment gateway di panel admin dan lihat transaksi serta balasan dari gateway.
+
+## Masih buntu?
+
+Lihat [Mendapatkan bantuan](/id/docs/getting-started/getting-help/). Sebutkan versi yang Anda pakai, apa yang Anda harapkan, apa yang terjadi, dan teks error jika ada.

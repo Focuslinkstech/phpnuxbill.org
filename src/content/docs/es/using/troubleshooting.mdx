@@ -1,0 +1,67 @@
+---
+title: Solución de problemas
+description: Soluciones a los problemas más comunes, desde un cron que no se ejecuta hasta pagos que no se activan.
+section: using
+order: 10
+---
+Empieza por el síntoma que ves.
+
+## Los clientes siguen en línea cuando termina su plan
+
+La tarea cron no se está ejecutando. Los planes se vencen y se renuevan con `system/cron.php`, así que sin ella nada vence.
+
+1. Abre el panel. El widget del cron muestra cuándo se ejecutó por última vez y te avisa pasadas 24 horas.
+2. Ejecuta la tarea a mano desde la carpeta `system` y lee la salida:
+
+   ```bash
+   cd /path/to/site/system && php cron.php
+   ```
+
+3. Si eso funciona pero la programación no, revisa la línea del crontab de [Instalación](/es/docs/getting-started/installation/#cron). La causa habitual es una ruta de PHP incorrecta. Encuentra la tuya con `which php`.
+4. Si no puedes programar tareas por CLI (algunos hostings compartidos), `cron.php` también se puede solicitar por HTTP desde un programador externo.
+
+## Una página en blanco o un error 500
+
+1. Comprueba que PHP sea 8.2 o superior y que las extensiones PDO, MySQLi, GD, cURL, ZIP y mbstring estén cargadas.
+2. Lee el registro de errores del servidor web. Indica el archivo y la línea.
+3. Para ver los errores en el navegador en una máquina de pruebas, establece `$_app_stage` en `config.php` con cualquier valor distinto de `Live`. Vuelve a dejarlo como estaba después, porque también muestra los errores a tus clientes.
+4. Los errores no capturados se muestran en una página de error, así que una página casi vacía suele significar que ocurrió un error, no que no pasara nada.
+
+## Todas las páginas salvo la de inicio dan un 404
+
+Las URL amigables necesitan reescritura.
+
+- **Apache:** activa `mod_rewrite` y establece `AllowOverride All` para el sitio, de modo que se lea el `.htaccess` de la raíz.
+- **Nginx:** envía toda ruta que no sea un archivo a `index.php?_route=$1`.
+
+Para confirmar que este es el problema, abre `index.php?_route=login`. Si eso funciona, la causa es la reescritura.
+
+## "Permission denied", o ajustes que no se guardan
+
+El servidor web debe poder escribir en `system/uploads/`, `system/cache/`, `ui/compiled/`, `ui/cache/` y `system/lan/`.
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+```
+
+El usuario es `www-data` en Debian y Ubuntu. En otros sistemas puede ser `apache` o `nginx`.
+
+## Las páginas se ven desactualizadas tras una actualización
+
+Las plantillas se compilan y se guardan en caché. Elimina los archivos dentro de `ui/compiled/` y `ui/cache/` (conserva las carpetas) y recarga. Haz también una recarga forzada en el navegador para que descarte la hoja de estilos en caché.
+
+## El router no se conecta
+
+Consulta [Conecta un router](/es/docs/getting-started/connect-a-router/). Comprueba que el servicio API esté activado en el router, que ninguna regla de firewall bloquee el puerto de la API desde el servidor y que el usuario del router pueda usar la API.
+
+## Un cliente pagó pero el plan no se activó
+
+La pasarela no pudo llegar a PHPNuxBill, o PHPNuxBill no pudo confirmar el pago.
+
+1. Revisa la URL de callback que le diste a la pasarela. Consulta [Pasarelas de pago](/es/docs/using/payment-gateways/#la-url-de-callback).
+2. Asegúrate de que el sitio esté en una dirección pública con HTTPS. Una pasarela no puede llamar a `localhost` ni a una IP privada.
+3. Abre la auditoría de pasarelas de pago en el panel de administración y mira la transacción y la respuesta de la pasarela.
+
+## ¿Sigues atascado?
+
+Consulta [Obtener ayuda](/es/docs/getting-started/getting-help/). Indica qué versión usas, qué esperabas, qué pasó y el texto de cualquier error.

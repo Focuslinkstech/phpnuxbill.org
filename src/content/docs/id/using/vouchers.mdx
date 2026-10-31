@@ -1,0 +1,22 @@
+---
+title: Voucher
+description: Buat, cetak, dan jual voucher prabayar.
+section: using
+order: 1
+---
+Voucher adalah kode yang mengaktifkan paket saat pelanggan memasukkannya di portal. Anda membuatnya dalam batch di menu *Services*.
+
+## Membuat batch
+
+Pilih Hotspot atau PPPoE, router dan paket, lalu nama batch, jumlah voucher (hingga 1000 sekali buat), format kode, prefiks opsional, dan panjang kode. Halaman menampilkan pratinjau kode sebelum Anda membuatnya. Centang *print now* untuk langsung membuka tampilan cetak setelah selesai.
+
+- **Kode bersifat unik.** Pembuatan memeriksa kode yang ada terlebih dahulu, dan database juga menjamin keunikan. Jika dua permintaan berebut kode yang sama, yang kalah mencoba lagi dengan kode baru, bukan menggagalkan seluruh batch.
+- **Prefiks dan panjang** bebas Anda pilih, sehingga satu batch mudah dibedakan sekilas.
+
+## Menukarkan
+
+Pelanggan membuka portal, memasukkan kode di *Voucher Activation*, lalu menekan *Recharge*. Paket mulai berjalan di akunnya seperti pembelian biasa.
+
+## Membersihkan
+
+`php system/cron/clean_expired_vouchers.php` menghapus akun voucher yang kedaluwarsa lebih dari 30 hari lalu. Tambahkan ke cron jika Anda membuat batch besar. Jalankan dengan `--dry-run` terlebih dahulu untuk melihat apa yang akan dihapus.

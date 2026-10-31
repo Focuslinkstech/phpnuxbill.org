@@ -1,0 +1,34 @@
+---
+title: التثبيت على جهازك
+description: شغّل PHPNuxBill محليًا على macOS أو Windows لتجربته أو للتطوير.
+section: getting-started
+order: 6
+---
+التثبيت المحلي يتبع الخطوات نفسها لأي تثبيت آخر. الذي يتغيّر هو طريقة الحصول على PHP وMySQL.
+
+## macOS
+
+1. ثبّت [Homebrew](https://brew.sh/).
+2. ثبّت PHP وقاعدة بيانات:
+
+   ```bash
+   brew install php composer
+   brew install mariadb   # or: brew install mysql
+   ```
+
+3. شغّل خادم PHP المدمج من مجلد PHPNuxBill:
+
+   ```bash
+   php -S localhost:8000
+   ```
+
+   لا يقرأ الخادم المدمج ملف `.htaccess`، لذا تحتاج الروابط الجميلة إلى إعداد Apache أو Nginx. أما فتح `/index.php?_route=...` فيعمل بدونه.
+
+## Windows
+
+1. ثبّت [XAMPP](https://www.apachefriends.org/index.html) أو [Laragon](https://laragon.org/).
+2. شغّل Apache وMySQL من لوحة التحكم.
+3. ضع ملفات PHPNuxBill في `htdocs` (XAMPP) أو `www` (Laragon).
+4. افتح `http://localhost/your-folder` وشغّل المثبّت.
+
+جدولة مهام cron أصعب على Windows. استخدم Task Scheduler، أو جهاز Linux لأي استخدام يتجاوز التجربة.

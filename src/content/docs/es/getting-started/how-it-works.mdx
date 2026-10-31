@@ -1,0 +1,25 @@
+---
+title: Cómo funciona
+description: Los vouchers, la plantilla de inicio de sesión y cómo llega un cliente desde la página de acceso de Mikrotik hasta estar en línea.
+section: getting-started
+order: 2
+---
+PHPNuxBill se creó primero para vender vouchers. Creas vouchers en PHPNuxBill y se los vendes a los clientes. Un voucher nunca entra en el Mikrotik. En su lugar, una plantilla de inicio de sesión en el router envía a los clientes a PHPNuxBill para registrarse. El cliente compra un voucher, se registra y lo activa en PHPNuxBill. Entonces PHPNuxBill añade al cliente al Mikrotik, y este inicia sesión en la página de acceso del router con su cuenta de PHPNuxBill.
+
+Las pasarelas de pago y el registro sencillo cambiaron esto. Ahora los vouchers son una opción entre varias: los clientes pueden comprar un paquete directamente desde la pasarela de pago en PHPNuxBill.
+
+## Voucher
+
+![Un voucher impreso](/img/voucher.jpg)
+
+## Plantilla de inicio de sesión
+
+La [plantilla de inicio de sesión de Mikrotik](https://github.com/hotspotbilling/phpnuxbill-mikrotik-login-template) envía a los clientes desde la página de acceso del router a PHPNuxBill.
+
+## Topología
+
+![Cómo se conectan el router, PHPNuxBill y los clientes](/img/topology.jpg)
+
+## Diagrama de flujo
+
+![De la página de acceso a estar en línea](/img/flow-chart.jpg)

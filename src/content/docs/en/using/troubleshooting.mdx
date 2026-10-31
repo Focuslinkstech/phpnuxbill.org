@@ -1,0 +1,67 @@
+---
+title: Troubleshooting
+description: Fixes for the problems people hit most, from cron not running to payments that do not activate.
+section: using
+order: 10
+---
+Start with the symptom you see.
+
+## Customers stay online after their plan ends
+
+The cron job is not running. Plans are expired and renewed by `system/cron.php`, so nothing expires without it.
+
+1. Open the dashboard. The cron widget shows when the job last ran, and warns you after 24 hours.
+2. Run the job by hand from the `system` folder and read the output:
+
+   ```bash
+   cd /path/to/site/system && php cron.php
+   ```
+
+3. If that works but the schedule does not, check the crontab line from [Installation](/docs/getting-started/installation/#cron). The usual cause is a wrong PHP path. Find yours with `which php`.
+4. If you cannot schedule CLI jobs (some shared hosts), `cron.php` can also be requested over HTTP from an external scheduler.
+
+## A blank page or a 500 error
+
+1. Check PHP is 8.2 or newer and that the PDO, MySQLi, GD, cURL, ZIP and mbstring extensions are loaded.
+2. Read the web server's error log. It names the file and line.
+3. To see errors in the browser on a test machine, set `$_app_stage` in `config.php` to anything other than `Live`. Set it back afterwards, because it also shows errors to your customers.
+4. Uncaught errors are shown on an error page, so a mostly empty page usually means an error happened, not that nothing did.
+
+## Every page except the home page gives a 404
+
+Pretty URLs need rewriting.
+
+- **Apache:** enable `mod_rewrite` and set `AllowOverride All` for the site, so the `.htaccess` in the root is read.
+- **Nginx:** send every path that is not a file to `index.php?_route=$1`.
+
+To confirm this is the problem, open `index.php?_route=login`. If that works, rewriting is the cause.
+
+## "Permission denied", or settings that do not save
+
+The web server must be able to write to `system/uploads/`, `system/cache/`, `ui/compiled/`, `ui/cache/` and `system/lan/`.
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+```
+
+The user is `www-data` on Debian and Ubuntu. On other systems it may be `apache` or `nginx`.
+
+## The pages look out of date after an update
+
+Templates are compiled and cached. Delete the files inside `ui/compiled/` and `ui/cache/` (keep the folders), then reload. Also hard-refresh the browser so it drops its cached stylesheet.
+
+## The router will not connect
+
+See [Connect a router](/docs/getting-started/connect-a-router/). Check that the API service is enabled on the router, that no firewall rule blocks the API port from the server, and that the router user can use the API.
+
+## A customer paid but the plan did not activate
+
+The gateway could not reach PHPNuxBill, or PHPNuxBill could not confirm the payment.
+
+1. Check the callback URL you gave the gateway. See [Payment gateways](/docs/using/payment-gateways/#the-callback-url).
+2. Make sure the site is on a public address with HTTPS. A gateway cannot call `localhost` or a private IP.
+3. Open the payment gateway audit in the admin panel and look at the transaction and the gateway's reply.
+
+## Still stuck?
+
+See [Getting help](/docs/getting-started/getting-help/). Say which version you run, what you expected, what happened, and any error text.

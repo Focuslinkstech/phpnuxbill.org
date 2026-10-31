@@ -1,0 +1,38 @@
+---
+title: Arsitektur
+description: Bagaimana permintaan mengalir melalui aplikasi, dan konvensi yang diikuti kode.
+section: reference
+order: 1
+---
+## Siklus permintaan
+
+```
+index.php  →  system/vendor/autoload.php
+           →  system/boot.php
+                 →  init.php   (autoloader, config.php, database, plugin, pengaturan)
+                 →  Smarty sebagai $ui, folder template
+                 →  $routes = explode('/', $_GET['_route'])
+                 →  system/controllers/{$routes[0]}.php
+```
+
+Aturan rewrite mengirim setiap path yang bukan file ke `index.php?_route=$1`, sehingga `/customers/edit/5` dan `?_route=customers/edit/5` adalah permintaan yang sama. `$routes[1]` adalah aksi dan `$routes[2]` adalah id.
+
+`system/api.php` adalah titik masuk kedua. Ia menjalankan controller yang sama tetapi mengembalikan variabel yang di-assign sebagai JSON, sehingga controller memakai `$ui->assign()`, `r2()`, dan `showResult()` alih-alih mencetak langsung.
+
+## Konvensi
+
+| Topik | Konvensi |
+|---|---|
+| Kelas | Tanpa namespace. `Foo` dimuat dari `system/autoload/Foo.php`. |
+| Database | Idiorm: `ORM::for_table('tbl_customers')->where(...)->find_one()`. |
+| Perubahan skema | Tambahkan ke `install/phpnuxbill.sql` dan sebagai kunci versi baru di `system/updates.json`. |
+| Autentikasi | `_admin()` untuk halaman staf, `_auth()` untuk halaman pelanggan. |
+| Input | `_post()`, `_get()`, `_req()` hanya melakukan trim. Tidak melakukan escape. |
+| CSRF | Buat dengan `Csrf::generateAndStoreToken()`, periksa dengan `Csrf::check()` sebelum mengubah data. |
+| Pengalihan | `r2(getUrl('path'), 's' atau 'e' atau 'w', Lang::T('Message'))`. |
+| Terjemahan | `Lang::T('English string')`, didukung oleh `system/lan/*.json`. |
+| Log | `_log($description, $type, $userid)` menulis ke `tbl_logs`. |
+
+## Titik perluasan
+
+Plugin mendaftarkan menu, rute, dan hook (`register_menu()`, `register_route()`, `register_hook()`). Controller memanggil `run_hook('name')` di tempat plugin boleh menambah halaman. Payment gateway, perangkat, dan widget dimuat berdasarkan nama dari folder masing-masing. Lihat [Jenis ekstensi](/id/docs/extending/overview/).

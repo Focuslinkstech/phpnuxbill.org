@@ -1,26 +1,24 @@
-# Nuxt dev/build outputs
+# build output
+dist
+.astro
+
+# dependencies
+node_modules
+
+# logs and local files
+logs
+*.log
+.DS_Store
+.idea
+.env
+.env.*
+!.env.example
+.vscode
+
+# leftovers of the previous Nuxt site
 .output
 .data
 .nuxt
 .nitro
 .cache
-dist
-
-# Node dependencies
-node_modules
-
-# Logs
-logs
-*.log
-
-# Misc
-.DS_Store
-.fleet
-.idea
-
-# Local env files
-.env
-.env.*
-!.env.example
-.vscode
 phpnuxbill.zip

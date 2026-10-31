@@ -1,0 +1,20 @@
+---
+// Real screenshots of the admin dashboard and the customer dashboard, in a window and a phone, in a light and a dark version.
+// The page's theme decides which one shows; the hidden one is lazy, so a browser only downloads the one that is visible.
+// They were taken from a demo install, so the numbers are sample data.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<div class="relative w-full pb-8 pe-4 sm:pe-10">
+  <div class="overflow-hidden rounded-2xl border bg-card shadow-[0_30px_60px_-30px_rgba(11,43,58,0.45)]">
+    <div class="flex items-center gap-1.5 border-b bg-muted px-4 py-2.5">
+      <span class="h-2.5 w-2.5 rounded-full bg-border"></span><span class="h-2.5 w-2.5 rounded-full bg-border"></span><span class="h-2.5 w-2.5 rounded-full bg-border"></span>
+    </div>
+    <img src={`${base}/img/dashboard.webp`} width="1360" height="800" alt="The PHPNuxBill admin dashboard, with customer, revenue and sales figures" class="block w-full dark:hidden" fetchpriority="high" />
+    <img src={`${base}/img/dashboard-dark.webp`} width="1360" height="800" alt="" aria-hidden="true" class="hidden w-full dark:block" loading="lazy" />
+  </div>
+
+  <div class="absolute -bottom-6 end-0 w-[6.5rem] drop-shadow-[0_24px_30px_rgba(11,43,58,0.35)] sm:w-[10rem] lg:w-[12rem]">
+    <img src={`${base}/img/phone-light.webp`} width="520" height="940" alt="The customer dashboard on a phone, with the plan, account details and the Buy button in the bottom bar" class="block w-full dark:hidden" />
+    <img src={`${base}/img/phone-dark.webp`} width="520" height="922" alt="" aria-hidden="true" class="hidden w-full dark:block" loading="lazy" />
+  </div>
+</div>

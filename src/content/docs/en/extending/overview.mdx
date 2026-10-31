@@ -1,0 +1,36 @@
+---
+title: Extension types
+description: Plugins, payment gateways, devices and themes, and the starter that scaffolds each one.
+section: extending
+order: 1
+---
+The Marketplace handles four kinds of extension the same way: install, update (with a backup), uninstall, requirement checks and a
+repository file. What differs is the shape.
+
+| | Plugin | Payment gateway | Device driver | Theme |
+|---|---|---|---|---|
+| Lives in | `system/plugin/` | `system/paymentgateway/` | `system/devices/` | `ui/themes/` |
+| Manifest | `plugin.json` | `gateway.json` | `device.json` | `theme.json` |
+| Layout | folder or one file | folder or one file | folder or one file | folder only |
+| Entry point | `<slug>.php`, loaded on every request | `<slug>.php`, loaded on demand | `<Class>.php`, `new <Class>` | templates and optional `functions.php` |
+
+## Start from the starter
+
+The [extension starter](https://github.com/hotspotbilling/phpnuxbill-ultimate-extensions-starter) has a ready-to-copy example of each type, with comments
+on every API a developer can use. It also scaffolds a renamed, zipped copy that the Marketplace can install:
+
+```bash
+php skeletons/build.php new plugin   acme_sms    "Acme SMS"
+php skeletons/build.php new gateway  acme_pay    "Acme Pay"
+php skeletons/build.php new device   AcmeRouter  "Acme Router"
+php skeletons/build.php new theme    acme_theme  "Acme Theme"
+```
+
+Check a plugin before you ship it:
+
+```bash
+php skeletons/build.php check plugin <folder>
+```
+
+Then read the page for your type: [plugins](/docs/extending/plugins/), [payment gateways](/docs/extending/gateways/),
+[devices](/docs/extending/devices/) or [themes](/docs/extending/themes/).

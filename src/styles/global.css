@@ -1,0 +1,128 @@
+@import '@fontsource-variable/bricolage-grotesque/wght.css';
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* the theme toggle puts a .dark class on <html>, so dark: utilities follow that class, not the operating system setting */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* shadcn/ui token names, so a component copied from shadcn works as is, with an ink-blue and teal palette: pale fog background,
+   teal for actions, amber for the one highlight. */
+:root {
+  --background: #f6fafb;
+  --foreground: #0b2b3a;
+  --card: #ffffff;
+  --muted: #e9f1f3;
+  --muted-foreground: #4a6674;
+  --border: #d5e3e8;
+  --primary: #0b2b3a;
+  --primary-foreground: #f6fafb;
+  --accent: #e3f0f2;
+  --ring: #0a7f7a;
+  --brand: #0a7f7a;
+  --sun: #f5a524;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: #081a22;
+  --foreground: #e6f1f4;
+  --card: #0e2530;
+  --muted: #12303c;
+  --muted-foreground: #8fb0bc;
+  --border: rgba(143, 176, 188, 0.2);
+  --primary: #e6f1f4;
+  --primary-foreground: #081a22;
+  --accent: #12303c;
+  --ring: #3cc4bc;
+  --brand: #3cc4bc;
+  --sun: #f5b94a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-sun: var(--sun);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --font-display: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@layer base {
+  * { border-color: var(--border); }
+  html { scroll-padding-top: 5rem; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+}
+
+/* Code blocks: Shiki writes the light colours inline and the dark ones as --shiki-dark variables; use those on a dark page. */
+.dark .astro-code, .dark .astro-code span { color: var(--shiki-dark) !important; }
+.astro-code { background: var(--muted) !important; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; font-size: 0.85rem; overflow-x: auto; }
+
+/* Docs typography, tuned to the tokens above */
+.prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-links: var(--brand);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-quotes: var(--muted-foreground);
+  --tw-prose-hr: var(--border);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+  --tw-prose-bullets: var(--muted-foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  max-width: none;
+}
+.prose :where(code):not(:where(pre code)) { background: var(--muted); border-radius: 0.35rem; padding: 0.1rem 0.35rem; font-weight: 500; font-size: 0.85em; }
+.prose :where(code):not(:where(pre code))::before, .prose :where(code):not(:where(pre code))::after { content: none; }
+.prose pre { background: var(--muted) !important; }
+.prose :where(table) { font-size: 0.875rem; }
+.prose :where(a) { text-underline-offset: 3px; }
+.prose :where(h2) { border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+
+.font-display { font-family: var(--font-display); font-optical-sizing: auto; }
+h1, h2, h3 { font-family: var(--font-display); }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) {
+  .rise { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+}
+
+/* the toggle shows one icon, for the current mode (set as data-mode on <html> by the script in Base.astro) */
+.theme-toggle svg { display: none; }
+html[data-mode='system'] .theme-toggle .i-system,
+html[data-mode='light'] .theme-toggle .i-light,
+html[data-mode='dark'] .theme-toggle .i-dark { display: block; }
+
+.slider-track { scrollbar-width: thin; scrollbar-color: var(--border) transparent; scroll-padding-inline: 0.25rem; }
+.slider-track:focus-visible { outline-offset: 4px; border-radius: var(--radius); }
+
+/* code and tables of code stay left to right inside right-to-left pages */
+[dir='rtl'] pre, [dir='rtl'] pre code, [dir='rtl'] .astro-code { direction: ltr; text-align: left; }
+[dir='rtl'] .prose :where(code):not(:where(pre code)) { direction: ltr; unicode-bidi: isolate; }
+[dir='rtl'] .prose :where(ul, ol) { padding-inline-start: 1.625em; padding-inline-end: 0; }
+
+/* back-to-top button: invisible and not clickable until the script marks it visible */
+.scroll-top { opacity: 0; transform: translateY(8px); pointer-events: none; }
+.scroll-top.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) { .scroll-top { transition: none; } }
+
+/* FAQ: the chevron turns when an answer is open; the default marker is hidden in every browser */
+.faq summary::-webkit-details-marker { display: none; }
+.faq[open] .faq-icon { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .faq-icon { transition: none; } }
+
+/* filter chips on the extensions page */
+.chip[aria-pressed='true'] { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
+.chip[aria-pressed='true']:hover { background: var(--foreground); }

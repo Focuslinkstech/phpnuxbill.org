@@ -1,0 +1,36 @@
+---
+title: Uzantı türleri
+description: "Eklentiler, ödeme geçitleri, cihazlar ve temalar; her birinin iskeletini oluşturan başlangıç paketi."
+section: extending
+order: 1
+---
+Marketplace dört tür uzantıyı aynı şekilde yönetir: kurulum, güncelleme (yedekle birlikte), kaldırma, gereksinim denetimleri ve
+bir depo dosyası. Fark, yapılarındadır.
+
+| | Eklenti | Ödeme geçidi | Cihaz sürücüsü | Tema |
+|---|---|---|---|---|
+| Konum | `system/plugin/` | `system/paymentgateway/` | `system/devices/` | `ui/themes/` |
+| Manifest | `plugin.json` | `gateway.json` | `device.json` | `theme.json` |
+| Yapı | klasör veya tek dosya | klasör veya tek dosya | klasör veya tek dosya | yalnızca klasör |
+| Giriş noktası | `<slug>.php`, her istekte yüklenir | `<slug>.php`, gerektiğinde yüklenir | `<Class>.php`, `new <Class>` | şablonlar ve isteğe bağlı `functions.php` |
+
+## Başlangıç paketiyle başlayın
+
+[Uzantı başlangıç paketi](https://github.com/hotspotbilling/phpnuxbill-ultimate-extensions-starter), her türden kopyalanmaya hazır bir örnek içerir ve
+geliştiricinin kullanabileceği her API için açıklamalar sunar. Ayrıca Marketplace'in kurabileceği, yeniden adlandırılmış ve zip'lenmiş bir kopya oluşturur:
+
+```bash
+php skeletons/build.php new plugin   acme_sms    "Acme SMS"
+php skeletons/build.php new gateway  acme_pay    "Acme Pay"
+php skeletons/build.php new device   AcmeRouter  "Acme Router"
+php skeletons/build.php new theme    acme_theme  "Acme Theme"
+```
+
+Yayınlamadan önce eklentinizi denetleyin:
+
+```bash
+php skeletons/build.php check plugin <folder>
+```
+
+Ardından kendi türünüzün sayfasını okuyun: [eklentiler](/tr/docs/extending/plugins/), [ödeme geçitleri](/tr/docs/extending/gateways/),
+[cihazlar](/tr/docs/extending/devices/) veya [temalar](/tr/docs/extending/themes/).

@@ -1,0 +1,67 @@
+---
+title: Sorun giderme
+description: "En sık karşılaşılan sorunların çözümleri: çalışmayan cron'dan etkinleşmeyen ödemelere kadar."
+section: using
+order: 10
+---
+Gördüğünüz belirtiyle başlayın.
+
+## Müşteriler paketleri bittikten sonra çevrimiçi kalıyor
+
+Cron görevi çalışmıyor. Paketlerin süresini sona erdiren ve paketleri yenileyen `system/cron.php` dosyasıdır; o çalışmadan hiçbir paketin süresi dolmaz.
+
+1. Gösterge panelini açın. Cron widget'ı görevin en son ne zaman çalıştığını gösterir ve 24 saat sonra sizi uyarır.
+2. Görevi `system` klasöründen elle çalıştırın ve çıktıyı okuyun:
+
+   ```bash
+   cd /path/to/site/system && php cron.php
+   ```
+
+3. Bu çalışıyor ama zamanlama çalışmıyorsa [Kurulum](/tr/docs/getting-started/installation/#cron) sayfasındaki crontab satırını kontrol edin. Olağan neden yanlış PHP yoludur. Sizinkini `which php` ile bulun.
+4. CLI görevlerini zamanlayamıyorsanız (bazı paylaşımlı barındırmalar), `cron.php` harici bir zamanlayıcıdan HTTP üzerinden de istenebilir.
+
+## Boş sayfa veya 500 hatası
+
+1. PHP'nin 8.2 veya daha yeni olduğunu ve PDO, MySQLi, GD, cURL, ZIP ve mbstring uzantılarının yüklü olduğunu kontrol edin.
+2. Web sunucusunun hata günlüğünü okuyun. Dosyayı ve satırı belirtir.
+3. Bir test makinesinde hataları tarayıcıda görmek için `config.php` içindeki `$_app_stage` değerini `Live` dışında bir şeye ayarlayın. Sonra geri alın, çünkü hataları müşterilerinize de gösterir.
+4. Yakalanmayan hatalar bir hata sayfasında gösterilir; bu yüzden neredeyse boş bir sayfa genellikle hiçbir şey olmadığını değil, bir hata olduğunu gösterir.
+
+## Ana sayfa dışındaki her sayfa 404 veriyor
+
+Düzgün URL'ler yeniden yazma (rewrite) gerektirir.
+
+- **Apache:** `mod_rewrite` modülünü etkinleştirin ve kökteki `.htaccess` dosyasının okunması için site için `AllowOverride All` ayarlayın.
+- **Nginx:** dosya olmayan her yolu `index.php?_route=$1` adresine yönlendirin.
+
+Sorunun bu olduğunu doğrulamak için `index.php?_route=login` adresini açın. Bu çalışıyorsa neden yeniden yazmadır.
+
+## "Permission denied" veya kaydedilmeyen ayarlar
+
+Web sunucusu `system/uploads/`, `system/cache/`, `ui/compiled/`, `ui/cache/` ve `system/lan/` klasörlerine yazabilmelidir.
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+```
+
+Debian ve Ubuntu'da kullanıcı `www-data`'dır. Diğer sistemlerde `apache` veya `nginx` olabilir.
+
+## Güncellemeden sonra sayfalar eski görünüyor
+
+Şablonlar derlenir ve önbelleğe alınır. `ui/compiled/` ve `ui/cache/` içindeki dosyaları silin (klasörleri bırakın), ardından sayfayı yenileyin. Tarayıcının önbelleğe alınmış stil dosyasını bırakması için sert yenileme de yapın.
+
+## Router bağlanmıyor
+
+[Router bağlama](/tr/docs/getting-started/connect-a-router/) sayfasına bakın. Router'da API hizmetinin etkin olduğunu, hiçbir güvenlik duvarı kuralının API portunu sunucudan engellemediğini ve router kullanıcısının API'yi kullanabildiğini kontrol edin.
+
+## Müşteri ödeme yaptı ama paket etkinleşmedi
+
+Geçit PHPNuxBill'e ulaşamadı veya PHPNuxBill ödemeyi doğrulayamadı.
+
+1. Geçide verdiğiniz callback adresini kontrol edin. [Ödeme geçitleri](/tr/docs/using/payment-gateways/#callback-adresi) sayfasına bakın.
+2. Sitenin HTTPS'li herkese açık bir adreste olduğundan emin olun. Bir geçit `localhost` veya özel bir IP'yi çağıramaz.
+3. Yönetim panelinde ödeme geçidi denetimini (payment gateway audit) açın ve işleme ile geçidin yanıtına bakın.
+
+## Hâlâ takıldınız mı?
+
+[Yardım alma](/tr/docs/getting-started/getting-help/) sayfasına bakın. Hangi sürümü kullandığınızı, ne beklediğinizi, ne olduğunu ve varsa hata metnini yazın.

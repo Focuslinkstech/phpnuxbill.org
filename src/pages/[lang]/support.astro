@@ -1,0 +1,7 @@
+---
+import SupportPage from '../../components/SupportPage.astro';
+import { OTHER_LANGS } from '../../i18n';
+export function getStaticPaths() { return OTHER_LANGS.map((lang) => ({ params: { lang } })); }
+const { lang } = Astro.params;
+---
+<SupportPage lang={lang as any} />

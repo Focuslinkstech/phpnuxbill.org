@@ -1,0 +1,49 @@
+---
+title: Updating and backups
+description: Take a backup, update to a new version, and roll back if something goes wrong.
+section: using
+order: 11
+---
+Back up before every update. An update changes the database, and a backup is the only way back.
+
+## What to back up
+
+| What | Why |
+|---|---|
+| The database | Customers, plans, transactions and settings. |
+| `config.php` | Database login and `APP_URL`. It is not in the download. |
+| `system/uploads/` | Logos, uploads and settings stored as files. |
+| Anything you added | Plugins in `system/plugin/`, gateways in `system/paymentgateway/`, and custom themes or templates in `ui/`. |
+
+### The database
+
+The dependable way is a dump from the server:
+
+```bash
+mysqldump -u phpnuxbilluser -p phpnuxbill > phpnuxbill-$(date +%F).sql
+```
+
+Under **Settings > Backup/Restore**, a SuperAdmin can also download chosen tables as a JSON file and upload one to restore. It is handy for moving data, but treat it with care: a restore **empties each table in the file before loading it**. Do not use it as your only backup, and try a restore on a copy first.
+
+## Update
+
+1. Take the backups above.
+2. Upload the new version over the old one. Keep your `config.php`, `system/uploads/` and the folders you added.
+3. Open `/update.php` in your browser. It runs the new database changes from `system/updates.json` and records the version in `version.json`.
+4. Delete the files inside `ui/compiled/` and `ui/cache/`.
+5. Sign in and check the dashboard, a customer page and the cron widget.
+
+Read the [release notes](/changelog/) first. They say what changed.
+
+## Roll back
+
+1. Put the old files back.
+2. Restore the database from your dump:
+
+   ```bash
+   mysql -u phpnuxbilluser -p phpnuxbill < phpnuxbill-2026-01-01.sql
+   ```
+
+3. Clear `ui/compiled/` and `ui/cache/`.
+
+Do not run an older version against a newer database without restoring the dump. The older code does not know the new columns.

@@ -1,0 +1,42 @@
+---
+title: Ödeme geçitleri
+description: Bir ödeme geçidi ekleyin, ona callback adresini verin ve müşteriler kullanmadan önce bir ödemeyi test edin.
+section: using
+order: 12
+---
+Ödeme geçidi, müşterilerin bir paketin ücretini çevrimiçi ödemesini sağlar. PHPNuxBill, geçit ödemeyi onayladığında paketi etkinleştirir.
+
+## Geçit ekleyin
+
+Hiçbir ödeme geçidi yerleşik gelmez. Her geçit [Marketplace](/tr/extensions/)'ten veya geçidin yazarından gelir. Yönetim panelinde Marketplace'i açın, ödeme geçitlerine gidin ve birini kurun ya da paketini yükleyin.
+
+Ardından **Settings > Payment Gateway** sayfasını açın, geçidi seçin ve formunu doldurun. Her geçit kendi anahtarlarını ister. Ücretli geçitler ayrıca bir lisans anahtarı isteyebilir; bunu Marketplace'teki kartından girersiniz.
+
+## Callback adresi
+
+Çoğu geçit, bir ödemenin başarılı olduğunu sitenizdeki bir adresi çağırarak PHPNuxBill'e bildirir. Adres şudur:
+
+```text
+https://your-domain.com/callback/<gateway>
+```
+
+`<gateway>`, geçidin adıdır; yani klasörünün veya dosyasının adı. Aynı adres `https://your-domain.com/?_route=callback/<gateway>` olarak da çalışır. Geçit sizden bir callback, webhook veya bildirim adresi istediğinde bunu verin.
+
+İnternetten erişilebilir olmalıdır. Bir geçit `localhost` adresini, özel bir IP'yi veya oturum açma arkasındaki bir sayfayı çağıramaz.
+
+## Bir geçidin istedikleri
+
+Çoğu, geçidin web sitesindeki hesabınızdan alınan anahtarları, örneğin bir istemci kimliği ve gizli anahtarı, bir de ücretlendirdiğiniz para birimini ister. Bazıları ayrıca yukarıdaki adres olan bir callback veya webhook adresi ister. Geçidin Marketplace'teki kendi sayfası neye ihtiyaç duyduğunu söyler.
+
+## Canlıya geçmeden önce test edin
+
+1. Önce geçidin sandbox veya test anahtarlarını kullanın.
+2. Müşteri olarak bir paket satın alın ve ödeyin.
+3. Paketin etkin olduğunu ve işlemin yönetim panelinde göründüğünü kontrol edin.
+4. Canlı anahtarları girin ve küçük bir gerçek ödeme yapın.
+
+Bir ödeme etkinleşmezse [Sorun giderme](/tr/docs/using/troubleshooting/#müşteri-ödeme-yaptı-ama-paket-etkinleşmedi) sayfasını izleyin.
+
+## Kendinizinkini geliştirin
+
+Geliştirme kılavuzundaki [Ödeme geçitleri](/tr/docs/extending/gateways/) sayfasına bakın.

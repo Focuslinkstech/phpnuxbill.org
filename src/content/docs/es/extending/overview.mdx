@@ -1,0 +1,33 @@
+---
+title: Tipos de extensión
+description: Plugins, pasarelas de pago, dispositivos y temas, y la plantilla que crea cada uno.
+section: extending
+order: 1
+---
+El Marketplace trata los cuatro tipos de extensión de la misma manera: instalar, actualizar (con copia de seguridad), desinstalar, comprobar requisitos y el archivo del repositorio. Lo que cambia es su forma.
+
+| | Plugin | Pasarela de pago | Controlador de dispositivo | Tema |
+|---|---|---|---|---|
+| Ubicación | `system/plugin/` | `system/paymentgateway/` | `system/devices/` | `ui/themes/` |
+| Manifiesto | `plugin.json` | `gateway.json` | `device.json` | `theme.json` |
+| Estructura | carpeta o un archivo | carpeta o un archivo | carpeta o un archivo | solo carpeta |
+| Punto de entrada | `<slug>.php`, se carga en cada petición | `<slug>.php`, se carga cuando hace falta | `<Class>.php`, `new <Class>` | plantillas y `functions.php` opcional |
+
+## Empieza con la plantilla
+
+La [plantilla de extensiones](https://github.com/hotspotbilling/phpnuxbill-ultimate-extensions-starter) trae un ejemplo listo para copiar de cada tipo, con comentarios en cada API que puede usar un desarrollador. También genera una copia renombrada y comprimida que el Marketplace puede instalar:
+
+```bash
+php skeletons/build.php new plugin   acme_sms    "Acme SMS"
+php skeletons/build.php new gateway  acme_pay    "Acme Pay"
+php skeletons/build.php new device   AcmeRouter  "Acme Router"
+php skeletons/build.php new theme    acme_theme  "Acme Theme"
+```
+
+Comprueba un plugin antes de publicarlo:
+
+```bash
+php skeletons/build.php check plugin <folder>
+```
+
+Después lee la página de tu tipo: [plugins](/es/docs/extending/plugins/) (en inglés), [pasarelas de pago](/es/docs/extending/gateways/), [dispositivos](/es/docs/extending/devices/) o [temas](/es/docs/extending/themes/).

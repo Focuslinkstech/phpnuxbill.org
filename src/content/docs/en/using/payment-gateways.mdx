@@ -1,0 +1,42 @@
+---
+title: Payment gateways
+description: Add a payment gateway, give it the callback URL, and test a payment before customers use it.
+section: using
+order: 12
+---
+A payment gateway lets customers pay for a plan online. PHPNuxBill activates the plan when the gateway confirms the payment.
+
+## Add a gateway
+
+No payment gateway is built in. Every gateway comes from the [Marketplace](/extensions/) or from the gateway's author. In the admin panel, open the Marketplace, go to payment gateways and install one, or upload its package.
+
+Then open **Settings > Payment Gateway**, choose the gateway, and fill in its form. Each gateway asks for its own keys. Paid gateways may also need a licence key, which you enter from its card in the Marketplace.
+
+## The callback URL
+
+Most gateways tell PHPNuxBill a payment succeeded by calling a URL on your site. The address is:
+
+```text
+https://your-domain.com/callback/<gateway>
+```
+
+`<gateway>` is the gateway's name, which is the name of its folder or file. The same address also works as `https://your-domain.com/?_route=callback/<gateway>`. Give it to the gateway when it asks for a callback, webhook or notification URL.
+
+It must be reachable from the internet. A gateway cannot call `localhost`, a private IP, or a page behind a login.
+
+## What a gateway asks for
+
+Most ask for the keys from your account on the gateway's website, such as a client ID and a secret key, and the currency you charge in. Some also ask for a callback or webhook URL, which is the address above. The gateway's own page in the Marketplace says what it needs.
+
+## Test before you go live
+
+1. Use the gateway's sandbox or test keys first.
+2. As a customer, buy a plan and pay.
+3. Check that the plan is active and the transaction shows in the admin panel.
+4. Swap in the live keys and make one small real payment.
+
+If a payment does not activate, follow [Troubleshooting](/docs/using/troubleshooting/#a-customer-paid-but-the-plan-did-not-activate).
+
+## Build your own
+
+See [Payment gateways](/docs/extending/gateways/) in the extending guide.

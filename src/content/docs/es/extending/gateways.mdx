@@ -1,0 +1,26 @@
+---
+title: Pasarelas de pago
+description: Las funciones que ofrece una pasarela y cómo las llama el sistema de facturación.
+section: extending
+order: 11
+---
+Una pasarela es una carpeta `system/paymentgateway/<slug>/` con `gateway.json`, `<slug>.php` y una carpeta `ui/` (también sirve un único archivo en
+`system/paymentgateway/`). El sistema de facturación incluye el archivo de la pasarela solo cuando hace falta: al pagar, en la
+página de configuración de la pasarela y para el webhook del proveedor. Después llama a funciones con el nombre del slug.
+
+| Función | Tarea |
+|---|---|
+| `<slug>_validate_config()` | Antes de cada pago: redirige con un mensaje si el administrador no la ha configurado. |
+| `<slug>_show_config()` / `<slug>_save_config()` | La página de configuración del administrador y su POST. Comprueba el CSRF; los ajustes se guardan en `tbl_appconfig` como `<slug>_*`. |
+| `<slug>_create_transaction($trx, $user)` | El cliente eligió la pasarela: crea el pago en el proveedor y redirige. |
+| `<slug>_get_status($trx, $user)` | El cliente vuelve o pulsa "check payment". |
+| `<slug>_payment_notification()` | El webhook del proveedor en `callback/<slug>`: verifica la firma y liquida el pedido. |
+
+## Reglas que te ahorran problemas
+
+- **Liquidar debe ser idempotente.** La consulta periódica y el webhook pueden llegar los dos para el mismo pedido.
+- **Resuelve el archivo con `GatewayLoader::file($slug)`**, nunca uniendo rutas tú mismo.
+- **Las plantillas** van en `ui/<slug>.tpl` y se referencian como `<slug>.tpl` a secas o como `pg:<slug>.tpl`.
+- **Una pasarela con un error de PHP**, un requisito sin cumplir o sin licencia no se puede activar.
+
+El contrato completo, con códigos de estado y notas de seguridad del webhook, está en el `gateway/README.md` de la plantilla.

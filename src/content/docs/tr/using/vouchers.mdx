@@ -1,0 +1,27 @@
+---
+title: Voucher'lar
+description: Ön ödemeli voucher'lar oluşturun, yazdırın ve satın.
+section: using
+order: 1
+---
+Voucher, müşteri onu portalda girdiğinde bir paketi etkinleştiren bir koddur. Voucher'ları *Services* altında toplu olarak oluşturursunuz.
+
+## Toplu oluşturma
+
+Hotspot veya PPPoE'yi, router'ı ve paketi seçin; ardından bir toplu iş adı, oluşturulacak voucher sayısı (her seferde en fazla 1000),
+kod biçimi, isteğe bağlı bir önek ve kod uzunluğu girin. Sayfa, oluşturmadan önce kodların bir önizlemesini gösterir.
+Oluşturduktan hemen sonra yazdırma görünümünü açmak için *print now* seçeneğini işaretleyin.
+
+- **Kodlar benzersizdir.** Oluşturma işlemi önce mevcut kodları denetler ve benzersizliği veritabanı da zorunlu kılar. İki
+  istek aynı kod için yarışırsa, kaybeden tüm toplu işi başarısız kılmak yerine yeni bir kodla yeniden dener.
+- **Önek ve uzunluk** size kalmıştır; böylece bir toplu iş bir bakışta ayırt edilebilir.
+
+## Kullanma
+
+Müşteri portalı açar, kodu *Voucher Activation* altına girer ve *Recharge* düğmesine basar. Paket, diğer satın alımlar gibi
+hesabında başlar.
+
+## Temizlik
+
+`php system/cron/clean_expired_vouchers.php`, 30 günden uzun süre önce süresi dolmuş voucher hesaplarını kaldırır. Büyük toplu işler
+oluşturuyorsanız bunu cron'a ekleyin. Neyi sileceğini görmek için önce `--dry-run` ile çalıştırın.

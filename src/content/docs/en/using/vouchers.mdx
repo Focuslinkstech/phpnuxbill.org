@@ -1,0 +1,28 @@
+---
+title: Vouchers
+description: Generate, print and sell prepaid vouchers.
+section: using
+order: 1
+---
+A voucher is a code that activates a plan when a customer enters it in the portal. You generate them in batches under
+*Services*.
+
+## Generating a batch
+
+Choose Hotspot or PPPoE, the router and the plan, then a batch name, how many vouchers to create (up to 1000 at a time), the
+code format, an optional prefix and the code length. The page shows a preview of the codes before you generate them. Tick
+*print now* to open the print view straight after generating.
+
+- **Codes are unique.** Generation checks existing codes first, and the database enforces uniqueness as well. If two
+  requests race for the same code, the loser retries with a new one instead of failing the whole batch.
+- **Prefix and length** are yours to choose, so a batch can be told apart at a glance.
+
+## Redeeming
+
+The customer opens the portal, enters the code under *Voucher Activation* and presses *Recharge*. The plan starts on their
+account like any other purchase.
+
+## Cleaning up
+
+`php system/cron/clean_expired_vouchers.php` removes voucher accounts that expired more than 30 days ago. Add it to cron if you
+generate large batches. Run it with `--dry-run` first to see what it would delete.

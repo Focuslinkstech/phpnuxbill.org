@@ -1,0 +1,61 @@
+---
+title: VPS'e kurulum
+description: PHPNuxBill'i Apache veya Nginx çalıştıran kendi Linux sunucunuza kurun.
+section: getting-started
+order: 5
+---
+## 1. Sunucuyu hazırlayın
+
+- Ubuntu veya Debian gibi desteklenen bir Linux sistemi kullanın ve paketlerini güncelleyin.
+- Bir web sunucusu (Apache veya Nginx), PHP 8.2 veya üzeri ve MySQL ya da MariaDB kurun.
+- [Gereksinimler](/tr/docs/getting-started/installation/#gereksinimler) bölümünde listelenen PHP uzantılarını kurun.
+- Bir güvenlik duvarı ayarlayın.
+- Bir SSL sertifikası alın. Let's Encrypt ücretsizdir.
+
+## 2. PHPNuxBill'i indirin
+
+```bash
+cd /var/www/html
+
+# with git
+git clone https://github.com/hotspotbilling/phpnuxbill-ultimate.git .
+
+# or download a release and unpack it
+wget https://github.com/hotspotbilling/phpnuxbill-ultimate/archive/refs/heads/main.zip
+unzip main.zip
+```
+
+## 3. Veritabanını oluşturun
+
+```sql
+CREATE DATABASE phpnuxbill;
+CREATE USER 'phpnuxbilluser'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON phpnuxbill.* TO 'phpnuxbilluser'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Bunu `mysql -u root -p` komutundan sonra çalıştırın.
+
+## 4. Web sunucusunu yapılandırın
+
+- **Apache:** PHPNuxBill klasörünü gösteren bir sanal ana bilgisayar oluşturun ve `mod_rewrite` modülünü etkinleştirin. Yönlendirmeyi kök dizindeki `.htaccess` yapar.
+- **Nginx:** aynı kök dizine ve PHP işlemeye sahip bir server bloğu oluşturun, dosya olmayan her yolu `index.php?_route=$1` adresine yönlendirin.
+
+## 5. İzinleri ayarlayın
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+```
+
+`system/uploads/`, `system/cache/`, `ui/compiled/`, `ui/cache/` ve `system/lan/` web sunucusu tarafından yazılabilir kalmalıdır.
+
+## 6. Yükleyiciyi çalıştırın
+
+Sitenizi tarayıcıda açın ve yükleyiciyi izleyin. 3. adımdaki veritabanı bilgilerini girin.
+
+## 7. Tamamlayın
+
+- Yönetim paneline giriş yapın ve `install` klasörünü silin.
+- [Kurulum](/tr/docs/getting-started/installation/#cron) sayfasındaki cron görevlerini ekleyin.
+- Ödeme geçitlerinizi, e-postanızı ve diğer ayarları yönetim panelinden yapın.

@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { marked } from 'marked';
+import changelog from '../data/changelog.md?raw';
+import { pages } from '../i18n/pages';
+import { SITE } from '../site';
+import { type Lang } from '../i18n';
+interface Props { lang: Lang; }
+const P = pages[Astro.props.lang].changelog;
+
+// The text is ours, but treat it as untrusted anyway: raw HTML in it is dropped, only Markdown is rendered.
+marked.use({ renderer: { html: () => '' } });
+const html = marked.parse(changelog, { async: false }) as string;
+---
+<Base title={P.title} description={P.description}>
+  <div class="mx-auto max-w-3xl px-4 py-12 lg:py-16">
+    <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">{P.title}</h1>
+    <p class="mt-4 text-lg text-muted-foreground">{P.intro}</p>
+    <div class="prose dark:prose-invert mt-10" lang="en" dir="ltr" set:html={html} />
+    <p class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2">
+      <a href={`${SITE.repo}/blob/main/CHANGELOG.md`} rel="noopener" class="font-semibold text-brand hover:underline">{P.full}</a>
+      <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/rss.xml`} class="font-semibold text-brand hover:underline">RSS</a>
+    </p>
+  </div>
+</Base>

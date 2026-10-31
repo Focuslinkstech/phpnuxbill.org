@@ -1,0 +1,18 @@
+# The site is built and served by Cloudflare Pages on every push. This job only asks Pages for a fresh build once a day,
+# because the extension list, contributors and latest release are fetched while the site is built.
+# Setup: Cloudflare Pages > Settings > Builds > Deploy hooks, then save the hook URL as the repository secret CF_DEPLOY_HOOK.
+name: Daily rebuild
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger a Cloudflare Pages build
+        env:
+          HOOK: ${{ secrets.CF_DEPLOY_HOOK }}
+        run: |
+          test -n "$HOOK" || { echo "CF_DEPLOY_HOOK is not set"; exit 1; }
+          curl --fail --silent --show-error -X POST "$HOOK"

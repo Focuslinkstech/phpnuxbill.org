@@ -1,0 +1,38 @@
+---
+title: Hotspot login template
+description: Put the PHPNuxBill login template on a Mikrotik hotspot so customers are sent to your portal.
+section: getting-started
+order: 8
+---
+Customers of a hotspot meet the router's login page first. The login template replaces that page, so customers are sent to your PHPNuxBill portal to register, buy a plan and sign in. You need it for hotspot plans. PPPoE customers do not use it.
+
+## Set it up
+
+1. Download the [login template](https://github.com/hotspotbilling/phpnuxbill-mikrotik-login-template).
+2. Open `login.html`, `status.html` and `logout.html`. Search each for `TODO` and follow the instruction there. They ask for the address of your PHPNuxBill site.
+3. Delete `errors.txt`, then rename `errors.en.txt` to `errors.txt`.
+4. Replace `background.jpg` with your own picture.
+5. Delete the `remove_me` folder.
+6. Upload everything into the router's `hotspot` folder, and overwrite the files that are there. Use WinBox, *Files*.
+
+## Add your site to the walled garden
+
+The customer is not signed in yet, so the router blocks everything. Add your PHPNuxBill domain or IP address to the hotspot's **walled garden** (*IP > Hotspot > Walled Garden*). Without this the customer is sent to your portal and the page never loads. Add the domains your payment gateway uses as well, or the payment page will not open.
+
+## What the portal receives
+
+When the router sends a customer to PHPNuxBill, it passes along the customer's details. PHPNuxBill checks each one and keeps it for the visit:
+
+| Value | Meaning |
+|---|---|
+| `nux-mac` | The customer's MAC address |
+| `nux-ip` | The customer's IP address |
+| `nux-router` | The router's name |
+| `nux-key` | The CHAP details used to sign the customer in |
+| `nux-hostname` | The customer's device name |
+
+This is how a customer who just paid is signed in on the right router without typing anything.
+
+## Check it
+
+Connect a phone to the hotspot and open any web page. You should land on your portal. If you see the router's old page, the files were not overwritten. If the page never loads, check the walled garden.

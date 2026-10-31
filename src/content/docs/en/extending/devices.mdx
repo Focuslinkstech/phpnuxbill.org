@@ -1,0 +1,39 @@
+---
+title: Device drivers
+description: One class that creates and removes customer accounts on a router or other equipment.
+section: extending
+order: 12
+---
+A driver is one class. The billing engine builds it with no constructor arguments (`new $plan['device']`), so the class name must
+equal the file or folder name. A plan picks its driver in the plan form.
+
+| Method | Called when |
+|---|---|
+| `description()` | The device list needs a title, author and links. |
+| `add_customer($customer, $plan)` / `remove_customer($customer, $plan)` | A customer is activated or expires. |
+| `change_username($plan, $from, $to)` | A username changes. |
+| `add_plan($plan)` / `update_plan($old_name, $plan)` / `remove_plan($plan)` | A plan is created, edited or deleted. |
+| `connect_customer(...)` / `online_customer(...)` / `disconnect_customer(...)` | Hotspot login, status and logout. |
+| `sync_customer($customer, $plan)` | Optional. Re-sends an active customer to the device. |
+
+Leave unused methods empty rather than deleting them.
+
+```php
+class AcmeRouter
+{
+    public function description()
+    {
+        return ['title' => 'Acme Router', 'description' => 'Drives Acme routers.', 'author' => 'You'];
+    }
+
+    public function add_customer($customer, $plan)
+    {
+        $device = ORM::for_table('tbl_routers')->where('name', $plan['routers'])->find_one();
+        // call the device with $customer['username'], $customer['password'], $plan['name_plan']
+    }
+}
+```
+
+The core drivers (`MikrotikHotspot`, `MikrotikPppoe`, `MikrotikStatic`, `MikrotikVpn`, `Radius`, `RadiusALE`, `RadiusChillispot`,
+`RadiusRest`, `Voucher`, `Dummy`) cannot be replaced by an upload, and a driver that plans still use cannot be uninstalled.
+Do not touch real equipment when `$_app_stage` is `Demo`.

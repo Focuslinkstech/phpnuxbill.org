@@ -1,0 +1,61 @@
+---
+import { DEFAULT_LANG, ui, localePath, type Lang } from '../i18n';
+import { resolveDocs } from '../i18n/docs';
+const lang = (Astro.currentLocale ?? DEFAULT_LANG) as Lang;
+const t = ui[lang];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const { current } = Astro.props;
+const docs = await resolveDocs(lang);
+const groups = (Object.keys(t.sections) as (keyof typeof t.sections)[])
+  .map((key) => ({ name: t.sections[key], items: docs.filter((d) => d.section === key).sort((a, b) => a.order - b.order) }))
+  .filter((g) => g.items.length);
+---
+<nav aria-label="Documentation" class="text-sm">
+  <div class="mb-6">
+    <input id="search" type="search" placeholder={t.search} aria-label={t.search} autocomplete="off"
+      class="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
+    <ul id="search-results" class="mt-2 hidden max-h-80 overflow-y-auto rounded-md border bg-card p-1"></ul>
+  </div>
+  {groups.map((g) => (
+    <div class="mb-6">
+      <p class="mb-2 px-2 text-xs font-semibold tracking-wide text-muted-foreground">{g.name}</p>
+      <ul class="space-y-0.5">
+        {g.items.map((d) => (
+          <li>
+            <a href={localePath(lang, `/docs/${d.slug}/`)} aria-current={d.slug === current ? 'page' : undefined}
+              class:list={['block rounded-md px-2 py-1.5 hover:bg-accent', d.slug === current ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground']}>
+              {d.entry.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</nav>
+<script is:inline define:vars={{ base, none: t.searchNone, needBuild: t.searchBuild }}>
+  // Pagefind is generated at build time (npm run build) and indexes each language separately, using <html lang>. It is loaded on
+  // first focus, so pages that never search never download it.
+  (function () {
+    var input = document.getElementById('search'), list = document.getElementById('search-results'), pf, timer;
+    function load() {
+      if (!pf) pf = import(base + '/pagefind/pagefind.js').catch(function () { return null; });
+      return pf;
+    }
+    function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    input.addEventListener('focus', load);
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(async function () {
+        var q = input.value.trim();
+        if (!q) { list.classList.add('hidden'); return; }
+        var p = await load();
+        list.classList.remove('hidden');
+        if (!p) { list.innerHTML = '<li class="px-3 py-2 text-muted-foreground">' + esc(needBuild) + '</li>'; return; }
+        var res = await p.search(q), items = await Promise.all(res.results.slice(0, 8).map(function (r) { return r.data(); }));
+        list.innerHTML = items.length ? items.map(function (d) {
+          return '<li><a class="block rounded px-3 py-2 hover:bg-accent" href="' + d.url + '"><span class="font-medium">' + esc(d.meta.title || '') + '</span><span class="block text-xs text-muted-foreground">' + d.excerpt + '</span></a></li>';
+        }).join('') : '<li class="px-3 py-2 text-muted-foreground">' + esc(none) + '</li>';
+      }, 120);
+    });
+  })();
+</script>

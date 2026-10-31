@@ -1,0 +1,33 @@
+---
+title: Tema
+description: Ubah tampilan panel admin dan portal pelanggan dengan menimpa template dan beberapa token warna.
+section: extending
+order: 13
+---
+Tema adalah folder di `ui/themes/<slug>/` dengan `theme.json`. Tema menimpa template berdasarkan path: file di
+`ui/themes/<slug>/admin/customers/list.tpl` menggantikan `ui/ui/admin/customers/list.tpl`. Apa pun yang tidak ditimpa akan kembali ke
+tema induk (`"parent"` di `theme.json`) lalu ke tema bawaan.
+
+## Tambahan opsional
+
+- **`functions.php`** dijalankan pada setiap permintaan selama tema aktif, misalnya untuk menambah stylesheet atau helper Smarty. File ini
+  tidak boleh mencetak output atau memanggil `exit`, dan error PHP di dalamnya menghalangi pengaktifan.
+- **`styles/customer.css`** mengubah tampilan header, menu, bilah mobile, dan footer portal pelanggan dengan mendefinisikan ulang token warna
+  `--cm-*`, tanpa menyalin template.
+- **Mode gelap** adalah class `dark-mode` pada `<body>`. Atur gaya untuk keduanya.
+
+```css
+/* styles/customer.css */
+body.cm-chrome.modern-skin-dark {
+  --cm-accent: #18181b;
+  --cm-border: #e4e4e7;
+}
+```
+
+## Urutan pencarian template
+
+1. `ui/ui_custom/`
+2. `ui/themes/<your theme>/`
+3. `ui/ui/`
+
+Tidak ada tema satu file; tema selalu berupa folder.

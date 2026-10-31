@@ -1,0 +1,38 @@
+---
+title: البنية
+description: كيف يمر الطلب عبر التطبيق، والاصطلاحات التي يتبعها الكود.
+section: reference
+order: 1
+---
+## دورة الطلب
+
+```
+index.php  →  system/vendor/autoload.php
+           →  system/boot.php
+                 →  init.php   (autoloader, config.php, database, plugins, settings)
+                 →  Smarty as $ui, template folders
+                 →  $routes = explode('/', $_GET['_route'])
+                 →  system/controllers/{$routes[0]}.php
+```
+
+تُحوّل قاعدة إعادة الكتابة أي مسار ليس ملفًا إلى `index.php?_route=$1`، فالمساران `/customers/edit/5` و`?_route=customers/edit/5` هما الطلب نفسه. `$routes[1]` هو الإجراء و`$routes[2]` هو المعرّف.
+
+`system/api.php` نقطة دخول ثانية. تشغّل المتحكمات نفسها لكنها تُعيد المتغيرات المعيّنة بصيغة JSON، ولهذا تستخدم المتحكمات `$ui->assign()` و`r2()` و`showResult()` بدلًا من الطباعة المباشرة.
+
+## الاصطلاحات
+
+| الموضوع | الاصطلاح |
+|---|---|
+| الأصناف | بلا مساحات أسماء. يُحمَّل `Foo` من `system/autoload/Foo.php`. |
+| قاعدة البيانات | Idiorm: `ORM::for_table('tbl_customers')->where(...)->find_one()`. |
+| تغييرات المخطط | أضفها إلى `install/phpnuxbill.sql` وكمفتاح إصدار جديد في `system/updates.json`. |
+| المصادقة | `_admin()` لصفحات الموظفين، و`_auth()` لصفحات العملاء. |
+| المدخلات | `_post()` و`_get()` و`_req()` تقصّ المسافات فقط ولا تهرّب الرموز. |
+| CSRF | أنشئه بـ `Csrf::generateAndStoreToken()` وافحصه بـ `Csrf::check()` قبل تغيير البيانات. |
+| إعادة التوجيه | `r2(getUrl('path'), 's' أو 'e' أو 'w', Lang::T('Message'))`. |
+| الترجمة | `Lang::T('English string')` مدعومة بملفات `system/lan/*.json`. |
+| السجل | `_log($description, $type, $userid)` يكتب في `tbl_logs`. |
+
+## نقاط التوسعة
+
+تسجّل الإضافات القوائم والمسارات والخطافات (`register_menu()` و`register_route()` و`register_hook()`). تستدعي المتحكمات `run_hook('name')` حيث يمكن للإضافة أن تضيف إلى الصفحة. تُحمَّل بوابات الدفع والأجهزة والودجات بالاسم من مجلداتها. راجع [أنواع الإضافات](/ar/docs/extending/overview/).

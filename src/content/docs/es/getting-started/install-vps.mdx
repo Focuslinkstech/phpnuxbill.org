@@ -1,0 +1,61 @@
+---
+title: Instalar en un VPS
+description: Instala PHPNuxBill en tu propio servidor Linux con Apache o Nginx.
+section: getting-started
+order: 5
+---
+## 1. Prepara el servidor
+
+- Usa un sistema Linux compatible, como Ubuntu o Debian, y actualiza sus paquetes.
+- Instala un servidor web (Apache o Nginx), PHP 8.2 o superior, y MySQL o MariaDB.
+- Instala las extensiones de PHP indicadas en [Requisitos](/es/docs/getting-started/installation/#requisitos).
+- Configura un firewall.
+- Consigue un certificado SSL. Let's Encrypt es gratuito.
+
+## 2. Descarga PHPNuxBill
+
+```bash
+cd /var/www/html
+
+# with git
+git clone https://github.com/hotspotbilling/phpnuxbill-ultimate.git .
+
+# or download a release and unpack it
+wget https://github.com/hotspotbilling/phpnuxbill-ultimate/archive/refs/heads/main.zip
+unzip main.zip
+```
+
+## 3. Crea la base de datos
+
+```sql
+CREATE DATABASE phpnuxbill;
+CREATE USER 'phpnuxbilluser'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON phpnuxbill.* TO 'phpnuxbilluser'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Ejecútalo después de `mysql -u root -p`.
+
+## 4. Configura el servidor web
+
+- **Apache:** crea un virtual host que apunte a la carpeta de PHPNuxBill y activa `mod_rewrite`. El `.htaccess` de la raíz se encarga del enrutamiento.
+- **Nginx:** crea un bloque server con la misma raíz y el mismo manejo de PHP, y envía toda ruta que no sea un archivo a `index.php?_route=$1`.
+
+## 5. Ajusta los permisos
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+```
+
+`system/uploads/`, `system/cache/`, `ui/compiled/`, `ui/cache/` y `system/lan/` deben seguir siendo escribibles por el servidor web.
+
+## 6. Ejecuta el instalador
+
+Abre tu sitio en el navegador y sigue el instalador. Introduce los datos de la base de datos del paso 3.
+
+## 7. Termina
+
+- Inicia sesión en el panel de administración y elimina la carpeta `install`.
+- Añade las tareas cron de [Instalación](/es/docs/getting-started/installation/#cron).
+- Configura tus pasarelas de pago, el correo y otros ajustes en el panel de administración.

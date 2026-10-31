@@ -1,0 +1,9 @@
+---
+import DocPage from '../../components/DocPage.astro';
+import { resolveDocs } from '../../i18n/docs';
+export async function getStaticPaths() {
+  return (await resolveDocs('en')).map((doc) => ({ params: { slug: doc.slug }, props: { doc } }));
+}
+const { doc } = Astro.props;
+---
+<DocPage lang="en" doc={doc} />
