@@ -173,9 +173,10 @@ Marketplace, so set at least those and `author`.
 | Key | Required | Type | Notes |
 |---|---|---|---|
 | `update_url` | no | https URL | Answers JSON with `version` (or a GitHub release's `tag_name`); cached 6 hours. Without it the update check uses the store's `last_update` instead |
-| `github` | no | `https://github.com/<owner>/<repo>` | Where **Update** downloads the package (`master`, then `main`). Only github.com is supported |
+| `github` | no | `https://github.com/<owner>/<repo>` | Where **Update** downloads the package (`master`, then `main`) |
+| `zip` | no | https URL of a `.zip` | Where **Update** downloads the package from your own server or CDN instead of GitHub. Wins over `github` when both are set |
 
-Neither is secret. Both are read for every installed plugin on every Marketplace page, loaded or not, so they cannot move into PHP.
+None of these is secret. They are read for every installed plugin on every Marketplace page, loaded or not, so they cannot move into PHP.
 
 ### Licence (optional)
 
@@ -221,7 +222,7 @@ An array of menu entries. The core registers them in order, **after** your main 
 | `routes` | `register_route('fn', 'public')` |
 | `menus` | `register_menu(...)`, `register_submenu(...)` (mind the argument order) |
 | `requires_license`, `license_*` | `register_license(...)` and `license_has(...)` |
-| `name`, `version`, `description`, `author`, `main`, `requires_*`, `update_url`, `github`, `url` | stays in the manifest: the core needs them without running your code |
+| `name`, `version`, `description`, `author`, `main`, `requires_*`, `update_url`, `github`, `zip`, `url` | stays in the manifest: the core needs them without running your code |
 
 ## Publishing and serving updates
 
@@ -262,19 +263,23 @@ message per new version (Marketplace > Tools > Settings can turn that off).
 
 1. Raise `version` in `plugin.json` (and fix anything in `requires_*`, below).
 2. Run `php skeletons/build.php check plugin <folder>` and click through the plugin once.
-3. Commit and **push to the default branch** (`master`, then `main`). The marketplace downloads the branch archive, not a
-   tag or a release asset, so what is on that branch is what admins receive.
-4. Make the new version visible: publish the `update_url` JSON (or create the GitHub release), or bump `last_update` in
-   `repository.json`.
-
-The repository has to be public, unless the admin has entered a GitHub username and token in Settings > General Settings > GitHub Auth.
+3. Put the package where admins download it. Pick one:
+   * **GitHub:** commit and **push to the default branch** (`master`, then `main`). The marketplace downloads the branch
+     archive, not a tag or a release asset, so what is on that branch is what admins receive. The repository has to be public,
+     unless the admin has entered a GitHub username and token in Settings > General Settings > GitHub Auth.
+   * **Your own server or CDN:** zip the plugin (the manifest `plugin.json` at the top of the zip, or inside a single wrapper
+     folder), upload it to an `https` address and set `zip` in `repository.json` (and optionally in `plugin.json`). Add
+     `sha256` with the file's SHA-256 (`shasum -a 256 acme_sms-1.3.0.zip`) so the admin's site refuses a file that was changed
+     on the way. `php skeletons/build.php new plugin <slug> "<Name>"` already makes a zip of this shape.
+4. Make the new version visible: publish the `update_url` JSON (or create the GitHub release), or bump `last_update` (and
+   `sha256`, for a zip) in `repository.json`.
 
 ### 4. What the admin's site does on Update
 
 1. It checks `requires_php`, `requires_version`, `requires_extensions` and `requires_plugins`, and lints every `.php`
    file. A syntax error or an unmet requirement stops the update before anything is touched.
 2. It backs the current version up as a zip in `system/cache/backups/` (restorable from Marketplace > Tools).
-3. It downloads `<github>/archive/refs/heads/master.zip` (or `main`) and **copies the files over the installed folder**.
+3. It downloads the package (your `zip`, else `<github>/archive/refs/heads/master.zip`, or `main`) and **copies the files over the installed folder**.
    Files you delete in a new version stay on the admin's site, and the plugin's own data (tables, `tbl_appconfig` rows,
    uploads) is kept.
 4. `install.php` does **not** run again on an update; it runs once, on first install. Put schema changes in code that runs
@@ -305,6 +310,17 @@ Marketplace > Tools > Settings (one per line, `https` only), next to or instead 
       "url": "https://acme.example/sms",
       "github": "https://github.com/acme/acme_sms",
       "last_update": "2026-10-29"
+    },
+    {
+      "id": "acme_voice",
+      "name": "Acme Voice",
+      "description": "Voice calls through Acme, served from our own CDN.",
+      "author": "Acme",
+      "ispaid": false,
+      "url": "https://acme.example/voice",
+      "zip": "https://cdn.acme.example/plugins/acme_voice-1.0.0.zip",
+      "sha256": "9f2b5c0d7e1a4b83c6d5e0f1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5",
+      "last_update": "2026-11-06"
     }
   ],
   "payment_gateway": [],
@@ -314,10 +330,106 @@ Marketplace > Tools > Settings (one per line, `https` only), next to or instead 
 ```
 
 * `id` must equal the plugin's folder name (`slug`), or the entry is not matched to the installed plugin.
-* `github` is required to install from the entry. Today packages are fetched from GitHub only: a repository file on your
-  own server can list plugins, but the `.zip` itself is still downloaded from `github.com`. (An admin can always upload any
-  `.zip` by hand under Marketplace > Plugins.)
+* An entry needs one package source to be installable: `zip` or `github`. Choose either; if both are present, `zip` is used.
+* `zip` is an `https://` address of a `.zip`. Redirects are followed only over `https`, and a package larger than 50 MB is
+  refused, as is one that unpacks to more than 200 MB or holds more than 5,000 files. The address, and every redirect it takes, must lead
+  to a public host: one that resolves to a private, loopback or internal address is refused. It can be on any server or CDN, with no GitHub account involved.
+* `sha256` (optional, recommended) is the file's SHA-256 in 64 hexadecimal characters. When present, the site installs the zip
+  only if it matches, and an entry whose `sha256` is not 64 hex characters is refused rather than installed unchecked. Change it
+  whenever you replace the zip.
+* An update shows when `last_update` is newer than the installed date, so bump it with every new zip.
+* `version`, `public_key` and `signature` (all three, optional) sign the release: see *Signing your releases* below.
 * `url` is only the link on the card.
+
+A real entry that points at one fixed download address (Routely, a plugin served from its own server). The address always returns the
+newest release, so the entry never needs editing for a new version, and there is no `sha256` because the file behind it changes:
+
+```json
+{
+  "id": "routely",
+  "name": "Routely | SMS, WhatsApp and VPN",
+  "description": "VPN tunnels, SMS and WhatsApp for PHPNuxBill from one Routely account. Use your own Android phones or gateway, or link WhatsApp devices.",
+  "ispaid": false,
+  "author": "Focuslinks",
+  "url": "https://routely.focuslinkstech.com.ng/",
+  "zip": "https://routely-api.focuslinkstech.com.ng/v1/plugin/releases/routely-latest.zip",
+  "last_update": "2026-11-06"
+}
+```
+
+Use `zip` where an older entry has `"github": "https://github.com/..."`. The `github` field only accepts a github.com address, so a
+direct link put there is ignored. Keep a `github` address on the entry as well if sites on an older PHPNuxBill Ultimate should still
+be able to install it: those sites ignore `zip`.
+
+### 6. Signing your releases (optional, recommended)
+
+A SHA-256 only proves a file is the one the repository entry lists. A **signature** proves it was made by you: it can only be
+created with a private key that never leaves your computer, and every site checks it before anything is installed. Use it for
+anything people trust with their billing server.
+
+**The two keys**
+
+| | What it is | Who has it |
+|---|---|---|
+| Private key | A file with 128 hex characters. Signs each release. | Only you. Keep it offline, back it up, never commit or publish it. |
+| Public key | 64 hex characters. Checks signatures. | Everyone: it goes in your repository entry. |
+
+**Step 1. Make the key pair (once).** The PHP `sodium` extension is needed (it ships with PHP; enable `extension=sodium` if it is off):
+
+```
+php skeletons/build.php keygen acme-signing.key
+```
+
+It saves the private key in `acme-signing.key` and prints the public key. It refuses to overwrite an existing file. To print the
+public key again later: `php skeletons/build.php pubkey acme-signing.key`.
+
+**Step 2. For every release, build the zip and sign it.** The version you sign must be the `version` inside the zip's
+`plugin.json` (`gateway.json`, `device.json` or `theme.json`):
+
+```
+php skeletons/build.php sign acme-signing.key acme_voice-1.2.0.zip plugin acme_voice 1.2.0
+```
+
+The arguments are the key file, the zip, the type (`plugin`, `gateway`, `device` or `theme`), the entry `id` and the version.
+It prints the values for your entry:
+
+```json
+{
+  "zip": "https://cdn.acme.example/plugins/acme_voice-1.2.0.zip",
+  "sha256": "…64 hex…",
+  "version": "1.2.0",
+  "public_key": "…64 hex, the same every release…",
+  "signature": "…128 hex, new for every zip…"
+}
+```
+
+**Step 3. Upload the zip and publish the entry.** Put those five keys in the entry next to `id`, `name`, `description` and
+`last_update`. The `zip` must be a *versioned* address (`…-1.2.0.zip`): a fixed "latest" address cannot be signed, because its
+content changes while a signature is tied to one exact file.
+
+**What the admin's site checks**
+
+1. It downloads the zip and only verifies; it never signs. The signature covers the type, the `id`, the `version` and the
+   SHA-256 of the exact file, so it cannot be reused for another extension, an older version, or a changed file.
+2. The `version` inside the package must equal the signed `version`, or the install stops.
+3. **The first install remembers your public key.** From then on only that key can sign updates for that extension. An entry
+   that has another key, or that drops the signature, is refused ("installed with a signed release… not signed by the same
+   key"). So even if someone takes over your `repository.json`, they cannot push code without your private key.
+4. **No rollbacks.** A signature never expires, so a site that has version 1.3.0 installed refuses to install an older signed
+   release (1.2.0) from the entry. To go back deliberately, the admin uninstalls first.
+   A signed extension can only be updated from its repository entry, not from a bare `zip` in its manifest.
+5. An incomplete set (a key without a signature or a version) is refused, never installed unchecked, and the Marketplace only
+   shows "Signed" for a complete, well-formed set.
+
+**If you lose or leak the private key.** Nothing already installed breaks, but sites that remember the old key refuse updates
+signed with a new one. Make a new key pair and tell your users to **uninstall and reinstall** once (uninstall forgets the remembered
+key; plugin data and settings are kept in the database). A leaked key means anyone can sign as you, so rotate it at once.
+
+**Good practice**
+
+* Keep the key file off the server and out of git (add `*.key` to `.gitignore`), and keep a copy in a password manager.
+* Sign on the computer that builds your release, not on the web server.
+* Never reuse a version number for a different zip: it needs a new signature, and sites will have already seen the old one.
 
 ### Updates checklist
 
@@ -346,8 +458,8 @@ Each has its own starter with a README: `skeletons/gateway/`, `skeletons/device/
 
 All four manifests share the same keys for versions and requirements: `name`, `slug`, `version`, `description`, `author`,
 `main`, `requires_php`, `requires_extensions`, `requires_version`, `requires_plugins`, `requires_license`,
-`license_check_url`, `license_public_key`, `update_url`, `github` (a theme has no `main`, `requires_extensions` or `requires_plugins`). Gateways add
-`region`, devices add `category` (`Mikrotik`, `Radius`, `Voucher` or `Other`), themes add `parent` and `preview`. `update_url` and `github` work exactly as described above for any of them.
+`license_check_url`, `license_public_key`, `update_url`, `github`, `zip` (a theme has no `main`, `requires_extensions` or `requires_plugins`). Gateways add
+`region`, devices add `category` (`Mikrotik`, `Radius`, `Voucher` or `Other`), themes add `parent` and `preview`. `update_url`, `github` and `zip` work exactly as described above for any of them.
 
 ### What differs from `plugin.json`
 
@@ -599,7 +711,7 @@ Check, in this order:
    not a tag or a release file.
 3. Something announces it: `update_url` answers with the new version, or `last_update` is bumped in `repository.json`.
 4. The `update_url` answer is cached for 6 hours. The admin can press *Check for updates* to skip the wait.
-5. The repository entry's `id` equals your plugin's folder name, and it has a `github` address. Without a matching entry or
+5. The repository entry's `id` equals your plugin's folder name, and it has a `zip` or `github` address. Without a matching entry or
    an `update_url` there is nothing to compare against.
 
 **The update installed, but my new table or setting is missing.**
@@ -611,8 +723,13 @@ An update copies files over the installed folder and removes nothing. Keep the o
 migration delete it.
 
 **Can I serve the plugin from my own server or CDN instead of GitHub?**
-The repository list (`repository.json`) can live anywhere over `https`, and so can your `update_url`. The package itself is
-still downloaded from `github.com` today. An admin can always upload any `.zip` by hand under Marketplace > Plugins.
+Yes. Put the `.zip` on any `https` address and set `zip` (and ideally `sha256`) in your `repository.json` entry, or `zip` in
+`plugin.json` for the Update button. `repository.json` and `update_url` can live on the same server. GitHub is then not used at all.
+Admins can also paste a package address (with its SHA-256) under Marketplace > Plugins > Install a new plugin.
+
+**The install says the package does not match the SHA-256.**
+The file at `zip` is not the one `sha256` describes: a stale CDN cache, a re-uploaded zip, or a `sha256` not updated for the
+new version. Recompute it with `shasum -a 256 <file>` and update `repository.json`.
 
 **My repository is private.**
 The admin has to enter a GitHub username and token in Settings > General Settings > GitHub Auth, or the download fails. The
