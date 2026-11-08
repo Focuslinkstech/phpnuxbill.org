@@ -1,10 +1,24 @@
 ---
 title: Updating and backups
-description: Take a backup, update to a new version, and roll back if something goes wrong.
+description: Back up, update from the dashboard, apply database changes safely on a large site, and roll back if something goes wrong.
 section: using
 order: 11
 ---
-Back up before every update. An update changes the database, and a backup is the only way back.
+An update has two parts: new **program files**, and **database changes** (a new table, a new column, a corrected setting). The updater does both, in that order, and tells you plainly what it did.
+
+Back up before every update. The updater backs up the files it replaces, but not your database, and a database backup is the only way back from a database change.
+
+## Before you start
+
+| Check | Why |
+|---|---|
+| You are signed in as a **SuperAdmin** | Replacing program files is the most powerful thing an account can do, so no other role can open the updater. |
+| You have a **database backup** | See [What to back up](#what-to-back-up). |
+| The PHP **ZIP** extension is enabled | The package is downloaded and unpacked as a zip. |
+| The site folder and `system/cache/` are **writable** | Files are replaced in the site folder and the backup is written to `system/cache/backups/`. |
+| Free disk space | Room for the downloaded package, the unpacked copy and the backup zip. On a large database, also room to rebuild the biggest table the update changes. |
+
+Pick a quiet time. Customers see a maintenance page while the database step runs ([details below](#maintenance-mode-during-the-database-step)).
 
 ## What to back up
 
@@ -25,25 +39,158 @@ mysqldump -u phpnuxbilluser -p phpnuxbill > phpnuxbill-$(date +%F).sql
 
 Under **Settings > Backup/Restore**, a SuperAdmin can also download chosen tables as a JSON file and upload one to restore. It is handy for moving data, but treat it with care: a restore **empties each table in the file before loading it**. Do not use it as your only backup, and try a restore on a copy first.
 
-## Update
+## Update from the dashboard
 
-1. Take the backups above.
-2. Upload the new version over the old one. Keep your `config.php`, `system/uploads/` and the folders you added.
-3. Open `/update.php` in your browser. It runs the new database changes from `system/updates.json` and records the version in `version.json`.
-4. Delete the files inside `ui/compiled/` and `ui/cache/`.
-5. Sign in and check the dashboard, a customer page and the cron widget.
+1. Open **Community** in the side menu. The Updates card shows the installed version and the latest version, and says whether an update is available. The dashboard also shows an *Update Now* prompt when one is.
+2. Read the [release notes](/changelog/) to see what changed.
+3. Press **Install Latest Version**. This opens the updater's confirmation page. **Nothing is downloaded or changed yet.**
+4. Check the download address. By default it is the official `master` branch zip. You can use a fork, or set `$update_url` in `config.php` to your own address.
+5. Press **Start the update**. The progress panel shows five steps:
 
-Read the [release notes](/changelog/) first. They say what changed.
+| Step | What happens |
+|---|---|
+| **1. Download** | The package is downloaded and checked: it must be a real zip, within the size limit. |
+| **2. Check** | The zip is unpacked into a temporary folder and verified as a PHPNuxBill package. The updater also looks at the database work: how many changes will run, the largest tables they touch, and the free disk space. If something is wrong, it stops here and **no program file has been replaced**. |
+| **3. Install** | The program folders are backed up, then replaced. If the copy fails, the old files are put back. |
+| **4. Database** | The pending database changes are applied (see below). |
+| **5. Finish** | Caches are cleared, temporary folders removed, and the result is shown: the old and new version, the backup file, and how many database changes were applied. |
+
+Do not close the tab while it runs. If your connection drops, open `/update.php` again: a database step that was cut off carries on where it stopped.
+
+After the update, sign in and check the dashboard, a customer page and the cron widget.
+
+### What is replaced, and what is kept
+
+**Replaced:** the program code (`system/autoload/`, `system/vendor/`), the default screens and styles (`ui/ui/`), and every other file the package contains (controllers, language files, sample plugins and so on).
+
+**Kept:** `config.php`, your database and all its settings, uploaded files, and any file the package does not contain (your own plugins, payment gateways, themes, and files in `ui/ui_custom/`).
+
+The package overwrites files that have the same name, so keep your customisations in `ui/ui_custom/` and in your own plugin or theme folders. Never edit files under `ui/ui/` or `system/autoload/`: edits to shipped files are lost in an update (they are in the backup).
+
+### The backup the updater makes
+
+Before anything is replaced, the updater writes a zip of every file it is about to overwrite:
+
+```text
+system/cache/backups/phpnuxbill-before-OLD-to-NEW-DATE.zip
+```
+
+The folder is closed to web access. If the backup cannot be written, the update stops before touching anything. Copy the zip off the server if you want it to survive losing the server.
+
+## How the database changes are applied
+
+PHPNuxBill keeps its list of database changes in `system/updates.json`, one entry per version. The updater records each change it applies in a table named `tbl_migrations`, one row per statement.
+
+- **Only newer changes run.** A site is given a starting point (the version it was on), so history is never repeated. A fresh install starts at the latest version.
+- **A real error stops everything.** The page shows the version, the statement and the MySQL message. Nothing after it runs, because later changes may depend on it. The new program files are already installed at that point, and the page says so.
+- **It resumes.** Fix the cause, then press **Try this step again**: it continues from the failed statement. A request that dies halfway (a timeout, a closed browser) resumes the same way.
+- **"Already there" is not an error.** A table or column that already exists, an index already in place, or a repeated insert is recorded as *already in place* and skipped. These are counted separately in the final summary.
+- **Duplicate data is an error.** If a unique key cannot be added because your data already contains duplicates, the update stops and reports it instead of hiding it. Remove or merge the duplicates, then try again.
+- **Web runs work in short slices** of about 20 seconds and continue by themselves, so a proxy timeout cannot cut one off. A single very long table change on a huge table cannot be sliced: for that, use the command line.
+
+### Maintenance mode during the database step
+
+While tables change, customers see the maintenance page (the same one as **Settings > Maintenance Mode**). Staff pages keep working. It is lifted automatically when the last change finishes. If a change fails it stays on, because the database is half-changed; it is lifted when you finish the step. A maintenance mode you switched on yourself is never switched off by the updater.
+
+### Large databases: use the command line
+
+On a database of several gigabytes, a table change can take longer than a web request may run. Run the database step from the server instead:
+
+```bash
+cd /path/to/phpnuxbill
+php system/cron/migrate.php --status     # what is pending, the biggest tables touched, free disk; changes nothing
+php system/cron/migrate.php              # apply it
+```
+
+`--status` also reports any change that failed earlier. A site that has no migration record yet (for example, the files were uploaded by hand before the database was ever updated this way) must be told where to start:
+
+```bash
+php system/cron/migrate.php --baseline=2026.10.25   # the version the database was last updated to
+php system/cron/migrate.php
+```
+
+Only one database update can run at a time, from the web or the command line. This script is not a cron job: run it by hand when an update needs it. It refuses to run over the web.
+
+## Update by uploading the files yourself
+
+Some hosts block downloads from PHP, or you may want to test a package first.
+
+1. Download the release zip and unpack it on your computer.
+2. Back up your database and the folders you will overwrite.
+3. Upload the files over the site folder, **except `config.php`**.
+4. Open **Community** and press **Update Database**, or run `php system/cron/migrate.php` on the server.
+5. Delete the files inside `ui/compiled/` and `ui/cache/` if the screens look unchanged.
+
+A site that has never recorded its database history cannot tell which version it came from after a manual upload. If **Update Database** is the first thing you run on such a site, it applies every change and skips the ones that are already there. On a very old site, prefer the command line with `--baseline` set to the version you came from.
 
 ## Roll back
 
-1. Put the old files back.
-2. Restore the database from your dump:
+On **Community**, press **Select Old Version** and choose a commit from the list. The updater opens with that address filled in and **Allow an older version** ticked. Without that box ticked, a package older than the version you run is refused, so a rollback never happens by accident.
+
+A rollback puts the old program files back. **It does not undo database changes.** Older code usually runs on a newer database, because updates add tables and columns and rarely remove them, but if in doubt restore the database backup you took before updating.
+
+To undo an update completely, restore both:
+
+1. Unzip the backup from `system/cache/backups/` over the site folder.
+2. Restore your database dump:
 
    ```bash
    mysql -u phpnuxbilluser -p phpnuxbill < phpnuxbill-2026-01-01.sql
    ```
 
-3. Clear `ui/compiled/` and `ui/cache/`.
+3. Delete the files inside `ui/compiled/` and `ui/cache/`.
 
-Do not run an older version against a newer database without restoring the dump. The older code does not know the new columns.
+Do not run an older version against a newer database without restoring the dump unless you have checked that it works: the older code does not know the new columns.
+
+## When something goes wrong
+
+| What you see | What it means and what to do |
+|---|---|
+| *Only a SuperAdmin can use the updater* | Sign in with a SuperAdmin account. |
+| *That download address is not allowed* | Only https GitHub zips (a branch, a tag or a commit) or the address in `config.php` are accepted. |
+| *Failed to download* with a status such as 404 or 403 | The address is wrong, the repository is private, or GitHub cannot be reached from your server. Check that the server can make outbound HTTPS requests (cURL). |
+| *This is not a PHPNuxBill package* | The zip is from another project, or it was unpacked wrongly. Nothing was changed. |
+| *...is older than the installed version* | Tick **Allow an older version** if you really mean a rollback. |
+| *Free disk space ... is less than the largest table needs* (step 2) | Nothing was replaced. Free disk space where the database lives, then start again. |
+| A warning that the database account does not appear to have ALTER, CREATE, DROP or INDEX permission | Only a warning, because the server may grant rights in a way the check cannot see. If a change is then refused, give the database user those rights and run the step again. |
+| *Another update is running* | A lock file (`system/cache/update.lock`) exists. It expires after 30 minutes. If you are sure nothing is running, delete the file. |
+| *Database update stopped* with a statement and an error | Read the message (permissions, full disk, duplicate data). Fix it and press **Try this step again**, or run `php system/cron/migrate.php`. |
+| A blank page or old screens after an update | Delete the files inside `ui/compiled/` and `ui/cache/`, and clear your browser cache. |
+| Customers still see the maintenance page | The database step has not finished. Finish it, or switch the mode off in **Settings > Maintenance Mode**. |
+
+More fixes are on the [Troubleshooting](/docs/using/troubleshooting/) page.
+
+## Cron jobs
+
+An update does not change your cron jobs. PHPNuxBill still needs these, run from the `system` folder:
+
+```bash
+php system/cron.php                              # expires and renews customers; every minute or few minutes
+php system/cron_reminder.php                     # expiry reminders; once or twice a day
+php system/cron/clean_expired_vouchers.php       # housekeeping
+php system/cron/cleanup_stale_sessions.php       # housekeeping
+php system/cron/marketplace_sync.php             # optional: check for extension updates
+```
+
+## For developers: shipping a database change
+
+If you maintain a fork or a plugin that adds tables to the core:
+
+1. Add the change to `install/phpnuxbill.sql` so new installs have it.
+2. Add it as a new version key in `system/updates.json` so existing sites get it.
+3. Make every statement **safe to run twice**: `CREATE TABLE IF NOT EXISTS`, and for a column or an index use the guard pattern (`SET @s = (SELECT IF(it_is_missing, 'ALTER TABLE ...', 'SELECT 1')); PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;`). A data fix needs a `WHERE` that makes a second run change nothing.
+4. Bump `version.json` to the new version key.
+
+The two paths must give the same schema: a fresh install, and an old install plus every update, should have identical tables, columns and indexes. Check this before a release by building both and comparing `information_schema`.
+
+## Quick reference
+
+| Task | Where |
+|---|---|
+| See the installed and latest version | Community > Updates |
+| Update | Community > Install Latest Version (`/update.php`) |
+| Apply database changes only | Community > Update Database, or `php system/cron/migrate.php` |
+| Preview pending changes | `php system/cron/migrate.php --status` |
+| Go back | Community > Select Old Version, with *Allow an older version* ticked |
+| Find the backup | `system/cache/backups/` |
+| Read what changed | [Release notes](/changelog/) |

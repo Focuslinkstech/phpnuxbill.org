@@ -1,0 +1,144 @@
+---
+title: CSS and UI conventions
+description: Where the styles live, which colour tokens to use, how to build a list page from the shared kit, and the dark-mode traps to avoid.
+section: extending
+order: 14
+---
+This page is for anyone changing how PHPNuxBill looks: the core, a theme, or a plugin page. Read it before adding CSS, because
+most visual bugs in this project come from a handful of known traps, listed [below](#traps-to-avoid).
+
+## Where styles live
+
+| Stylesheet | What it styles |
+|---|---|
+| `ui/ui/styles/styles.css` | Shared by every skin: page components, the list kit, Marketplace, Community, customer pages. |
+| `ui/ui/styles/admin-chrome.css` | The default admin skin: side menu, top bar, footer. Loaded by the core admin header only. |
+| `ui/ui/styles/customer-modern.css` | The customer portal header, menu, mobile bar and footer. |
+
+The core admin page carries `body.as-chrome` and the customer portal carries `body.cm-chrome`. Dark mode is the `dark-mode`
+class on `<body>`. A theme's own body does not carry the core classes, so rules scoped by them never reach a theme.
+
+## Scope by your own skin, never by excluding another
+
+Scope a rule by the class your skin owns:
+
+```css
+/* right: matches only the default admin skin */
+body.as-chrome .my-card { border-radius: 12px; }
+
+/* wrong: core must not name a theme */
+body:not(.some-theme) .my-card { border-radius: 12px; }
+```
+
+A theme re-skins by redefining tokens or by shipping its own stylesheet (see [Themes](/docs/extending/themes/)). Core never
+mentions a theme by name.
+
+## Use tokens, not colours
+
+Hard-coded colours are what break dark mode. Use the token family of the area you are in, with a fallback:
+
+| Tokens | Area |
+|---|---|
+| `--as-*` | Side menu, top bar, footer. `--as-bg` is the surface the page and menu share. |
+| `--cv-*` | Form cards on the customer add, edit and view pages. |
+| `--ls-*` | The list kit (below). |
+| `--mp-*` | Marketplace. |
+| `--cm-*` | Customer portal chrome. A theme may redefine these. |
+
+```css
+.my-panel {
+  background: transparent;
+  border: 1px solid rgba(127, 127, 127, 0.28);   /* neutral: reads on light and dark */
+  border-radius: 12px;
+  color: var(--ls-ink, #1e293b);
+}
+```
+
+The neutral `rgba(127, 127, 127, ...)` border and a transparent fill are the house style for cards. They sit on the page
+colour in both modes without a second rule.
+
+## The list kit
+
+Every list page (customers, vouchers, plans, routers, logs, coupons and so on) is built from the same `ls-*` classes, so
+a new list needs no new CSS. Wrap the page in `ls`:
+
+```html
+<div class="ls">
+  <div class="ls-top"><div></div><div class="ls-actions">buttons</div></div>
+  <div class="ls-card">
+    <form class="ls-bar">search, filters and buttons</form>
+    <div class="ls-scroll">
+      <table class="ls-table">
+        <thead><tr><th>Name</th><th class="ls-end">Manage</th></tr></thead>
+        <tbody>
+          <tr>
+            <td data-label="Name"><b class="ls-strong">Plan A</b></td>
+            <td class="ls-end"><div class="ls-row-actions">buttons</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    pager
+  </div>
+</div>
+```
+
+| Class | Use |
+|---|---|
+| `ls-btn`, `ls-btn--primary`, `--sm`, `--icon`, `--danger` | Buttons. Give every button an icon, or none. |
+| `ls-pill` with `--active`, `--inactive`, `--banned` | A status. |
+| `ls-chip` | A small label such as a type or a code. |
+| `ls-num`, `ls-end`, `ls-dim`, `ls-when`, `ls-strong` | Right-aligned numbers, the actions column, muted text, no-wrap dates, emphasis. |
+| `ls-secret` | A value that stays blurred until hovered or tapped (codes, passwords). |
+| `ls-bulk` | The bar that appears when rows are ticked. |
+| `ls-empty` inside a `ls-none` row | The empty state. Say what to do next. |
+
+Rules for a list page:
+
+- Put `data-label` on every cell. On a phone the table turns into cards and the label is printed in front of the value.
+- Reuse the exact column title as the label.
+- Escape everything you print (`|escape`), including translated labels.
+- Keep search filters in the form so they survive the page change, and pass them on to the pager.
+- Use the shared pager (`pagination.tpl`). Do not restyle it per page.
+
+## Traps to avoid
+
+- **Focused inputs go white in dark mode.** A global rule paints a focused field white and its text near-black. If you give a
+  field a dark fill, restate it with the same weight as the global rule, and set the text colour with `-webkit-text-fill-color`:
+
+  ```css
+  body .my-field input:not(#filterNavigateMenu):focus {
+    background-color: var(--ls-field) !important;
+    color: var(--ls-ink);
+    -webkit-text-fill-color: var(--ls-ink);
+  }
+  ```
+
+- **`display` beats `[hidden]`.** A class that sets `display: grid` shows an element that has the `hidden` attribute. Add
+  `.thing[hidden] { display: none !important; }`.
+- **Equal weight is decided by file order.** Put a restating rule after the one it overrides, and match its selector.
+- **Hover is lost when you override a background.** Restate `:hover` with the same selector weight.
+- **The first table column is tinted by a global rule** (`th:first-child, td:first-child`). The list kit resets it. Do the same
+  for any table you build without the kit.
+- **Autofill paints its own background.** Style `:-webkit-autofill` for a field with a custom fill, and keep the focus ring: list
+  both the inset fill and the ring in one `box-shadow`.
+- **Icons:** only use Font Awesome 4 icons that exist in the bundled font. Some outline and brand icons render as an empty box.
+  Check the icon in the page before shipping.
+- **A hidden checkbox needs a positioned parent.** An absolutely positioned input inside a chip scrolls the page when focused if
+  its parent is not `position: relative`.
+
+## After you change a stylesheet
+
+1. Bump the `?version` after the file name in the header template that loads it, so browsers fetch the new file. `styles.css` is
+   linked from both admin headers; `admin-chrome.css` from the core admin header.
+2. Check **light and dark**, and a **390px** wide screen.
+3. Check a theme if you changed anything shared, because a theme loads `styles.css` too.
+4. Add a line to `CHANGELOG.md` under *Unreleased*.
+
+## Contributing
+
+- Keep a change to one concern. A UI change needs both the controller edit and the matching `.tpl`.
+- Use `Lang::T('English text')` for every visible string.
+- New PHP files carry the project header comment.
+- There is no build step, test suite or linter. Run the page in a local PHP server and look at it.
+- Open a pull request against `main` with what changed and a screenshot in each mode.
