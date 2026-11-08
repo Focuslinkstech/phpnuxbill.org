@@ -127,7 +127,7 @@ A site that has never recorded its database history cannot tell which version it
 
 On **Community**, press **Select Old Version** and choose a commit from the list. The updater opens with that address filled in and **Allow an older version** ticked. Without that box ticked, a package older than the version you run is refused, so a rollback never happens by accident.
 
-A rollback puts the old program files back. **It does not undo database changes.** Older code usually runs on a newer database, because updates add tables and columns and rarely remove them, but if in doubt restore the database backup you took before updating.
+A rollback puts the old program files back. **It does not undo database changes.** Older code often runs on a newer database, because updates add tables and columns and rarely remove them, but not always. If an update added a column that has no default value, inserts from the older code, which do not know about the column, can fail. If in doubt, restore the database backup you took before updating.
 
 To undo an update completely, restore both:
 

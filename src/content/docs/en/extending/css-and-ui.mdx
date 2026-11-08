@@ -50,7 +50,7 @@ Hard-coded colours are what break dark mode. Use the token family of the area yo
   background: transparent;
   border: 1px solid rgba(127, 127, 127, 0.28);   /* neutral: reads on light and dark */
   border-radius: 12px;
-  color: var(--ls-ink, #1e293b);
+  color: inherit;                                 /* follows the page text colour in light and dark */
 }
 ```
 
@@ -73,7 +73,7 @@ a new list needs no new CSS. Wrap the page in `ls`:
         <tbody>
           <tr>
             <td data-label="Name"><b class="ls-strong">Plan A</b></td>
-            <td class="ls-end"><div class="ls-row-actions">buttons</div></td>
+            <td class="ls-end" data-label="Manage"><div class="ls-row-actions">buttons</div></td>
           </tr>
         </tbody>
       </table>
