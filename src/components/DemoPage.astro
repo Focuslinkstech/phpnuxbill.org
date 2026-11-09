@@ -60,6 +60,8 @@ for (const d of DEMO_LOGINS) {
 </Base>
 
 <script>
+  // one status line is shared by every button, so only one clear timer may run: each new failure restarts it
+  let statusTimer: ReturnType<typeof setTimeout> | undefined;
   document.querySelectorAll<HTMLButtonElement>('.demo-copy').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const text = btn.dataset.copy ?? '';
@@ -72,7 +74,8 @@ for (const d of DEMO_LOGINS) {
         const status = document.getElementById('demo-copy-status');
         if (status) {
           status.textContent = status.dataset.manual ?? '';
-          setTimeout(() => { status.textContent = ''; }, 8000);
+          clearTimeout(statusTimer);
+          statusTimer = setTimeout(() => { status.textContent = ''; }, 8000);
         }
         return;
       }
