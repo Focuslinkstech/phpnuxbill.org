@@ -29,8 +29,8 @@ const authors = [...new Set([...repo.plugins, ...repo.gateways, ...repo.devices]
         <h1 class="text-[2.6rem] font-semibold leading-[1.04] tracking-tight sm:text-6xl">{L.hero.title}</h1>
         <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">{L.hero.text}</p>
         <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <a href={localePath(lang, '/docs/getting-started/installation/')} class="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white shadow-sm hover:brightness-110">{L.hero.install}</a>
-          <a href={COMMUNITY.demo} rel="noopener" class="rounded-full border border-foreground/20 px-6 py-3 text-sm font-semibold hover:bg-accent">{P.demo.hero}</a>
+          <a href={localePath(lang, '/docs/getting-started/installation/')} class="rounded-full bg-brand-fill px-6 py-3 text-sm font-semibold text-white shadow-sm hover:brightness-110">{L.hero.install}</a>
+          <a href={localePath(lang, '/demo/')} class="rounded-full border border-foreground/20 px-6 py-3 text-sm font-semibold hover:bg-accent">{P.demo.hero}</a>
           <a href="#day" class="rounded-full px-4 py-3 text-sm font-semibold text-muted-foreground hover:text-foreground">{L.hero.how}</a>
         </div>
         <p class="mt-5 text-sm text-muted-foreground">{L.hero.note}</p>
@@ -85,7 +85,7 @@ const authors = [...new Set([...repo.plugins, ...repo.gateways, ...repo.devices]
       <div>
         <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">{L.extend.title}</h2>
         <p class="mt-4 max-w-lg leading-relaxed opacity-80">{L.extend.text}</p>
-        <a href={localePath(lang, '/docs/extending/overview/')} class="mt-6 inline-block rounded-full bg-sun px-6 py-3 text-sm font-semibold text-[#0b2b3a] hover:brightness-105">{L.extend.button}</a>
+        <a href={localePath(lang, '/docs/extending/overview/')} class="mt-6 inline-block rounded-full bg-sun px-6 py-3 text-sm font-semibold text-[#0f1b33] hover:brightness-105">{L.extend.button}</a>
       </div>
       <pre dir="ltr" class="overflow-x-auto rounded-2xl border border-white/15 bg-black/25 p-5 text-start text-sm leading-relaxed"><code>{`// system/plugin/hello.php
 register_menu('Hello', true, 'hello', 'AFTER_DASHBOARD',
@@ -168,7 +168,7 @@ function hello()
       <h2 class="mx-auto max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">{L.close.title}</h2>
       <p class="mx-auto mt-4 max-w-xl text-muted-foreground">{L.close.text}</p>
       <div class="mt-8 flex flex-wrap justify-center gap-3">
-        <a href={localePath(lang, '/docs/getting-started/installation/')} class="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white hover:brightness-110">{L.close.install}</a>
+        <a href={localePath(lang, '/docs/getting-started/installation/')} class="rounded-full bg-brand-fill px-6 py-3 text-sm font-semibold text-white hover:brightness-110">{L.close.install}</a>
         <a href={COMMUNITY.forum} rel="noopener" class="rounded-full border border-foreground/20 px-6 py-3 text-sm font-semibold hover:bg-accent">{L.close.forum}</a>
         <a href={COMMUNITY.telegram} rel="noopener" class="rounded-full border border-foreground/20 px-6 py-3 text-sm font-semibold hover:bg-accent">{L.close.telegram}</a>
         <a href={COMMUNITY.facebook} rel="noopener" class="rounded-full border border-foreground/20 px-6 py-3 text-sm font-semibold hover:bg-accent">{L.close.facebook}</a>

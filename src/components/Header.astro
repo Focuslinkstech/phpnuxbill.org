@@ -21,7 +21,7 @@ const current = LANGUAGES.find((l) => l.code === lang)!;
       <a href={COMMUNITY.forum} rel="noopener" class="hover:text-foreground">{t.nav.forum}</a>
     </nav>
     <div class="ms-auto flex items-center gap-2">
-      <a href={COMMUNITY.demo} rel="noopener" class="rounded-full bg-brand px-3.5 py-1.5 text-sm font-semibold text-white hover:brightness-110">{t.nav.demo}</a>
+      <a href={localePath(lang, '/demo/')} class="rounded-full bg-brand-fill px-3.5 py-1.5 text-sm font-semibold text-white hover:brightness-110">{t.nav.demo}</a>
       <a href={SITE.repo} class="hidden rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground sm:block" rel="noopener">{t.nav.github}</a>
 
       <details class="lang relative">

@@ -5,36 +5,38 @@
 /* the theme toggle puts a .dark class on <html>, so dark: utilities follow that class, not the operating system setting */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* shadcn/ui token names, so a component copied from shadcn works as is, with an ink-blue and teal palette: pale fog background,
-   teal for actions, amber for the one highlight. */
+/* shadcn/ui token names, so a component copied from shadcn works as is, with an ink-blue palette taken from the PHPNuxBill logo: pale blue-grey background,
+   logo blue for actions, amber for the one highlight. */
 :root {
-  --background: #f6fafb;
-  --foreground: #0b2b3a;
+  --background: #f6f8fc;
+  --foreground: #0f1b33;
   --card: #ffffff;
-  --muted: #e9f1f3;
-  --muted-foreground: #4a6674;
-  --border: #d5e3e8;
-  --primary: #0b2b3a;
-  --primary-foreground: #f6fafb;
-  --accent: #e3f0f2;
-  --ring: #0a7f7a;
-  --brand: #0a7f7a;
+  --muted: #e9eef7;
+  --muted-foreground: #52627a;
+  --border: #d8e0ee;
+  --primary: #0f1b33;
+  --primary-foreground: #f6f8fc;
+  --accent: #e3ebf9;
+  --ring: #2860e0;
+  --brand: #2860e0;      /* the blue of the logo; white text on it is 5.5:1 */
+  --brand-fill: #2860e0; /* the background of a filled button */
   --sun: #f5a524;
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: #081a22;
-  --foreground: #e6f1f4;
-  --card: #0e2530;
-  --muted: #12303c;
-  --muted-foreground: #8fb0bc;
-  --border: rgba(143, 176, 188, 0.2);
-  --primary: #e6f1f4;
-  --primary-foreground: #081a22;
-  --accent: #12303c;
-  --ring: #3cc4bc;
-  --brand: #3cc4bc;
+  --background: #0a1220;
+  --foreground: #e6edf8;
+  --card: #0f1a2e;
+  --muted: #14213a;
+  --muted-foreground: #93a8c8;
+  --border: rgba(147, 168, 200, 0.2);
+  --primary: #e6edf8;
+  --primary-foreground: #0a1220;
+  --accent: #14213a;
+  --ring: #7aa2ff;
+  --brand: #7aa2ff;      /* text and links on the dark page (7.5:1) */
+  --brand-fill: #2f64e6; /* a filled button keeps white text readable (5.1:1) */
   --sun: #f5b94a;
 }
 
@@ -50,6 +52,7 @@
   --color-accent: var(--accent);
   --color-ring: var(--ring);
   --color-brand: var(--brand);
+  --color-brand-fill: var(--brand-fill);
   --color-sun: var(--sun);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);

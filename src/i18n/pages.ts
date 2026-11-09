@@ -3,6 +3,13 @@ import type { Lang } from './index';
 
 export interface Pages {
   demo: { hero: string };
+  demoPage: {
+    title: string; description: string; intro: string;
+    adminTitle: string; adminText: string; adminOpen: string;
+    customerTitle: string; customerText: string; customerOpen: string;
+    address: string; username: string; password: string; copy: string; copied: string;
+    noticeTitle: string; noticeText: string; install: string;
+  };
   download: { label: string; latest: string; notes: string };
   faq: { title: string; text: string; items: [string, string][] };
   extensions: {
@@ -23,6 +30,7 @@ export interface Pages {
 export const pages: Record<Lang, Pages> = {
   en: {
     demo: { hero: 'Try the live demo' },
+    demoPage: { title: 'Live demo', description: 'Try the PHPNuxBill admin panel and customer portal with a ready-made login, without installing anything.', intro: 'See PHPNuxBill working before you install it. There are two sides to try: the admin panel, which is what you run your business from, and the customer portal, which is what your subscribers see. Pick one, copy the login and open it.', adminTitle: 'Admin panel', adminText: 'For whoever runs the service: customers, plans, routers, vouchers, payments and reports.', adminOpen: 'Open the admin panel', customerTitle: 'Customer portal', customerText: 'What a subscriber sees: their plan and balance, buying or renewing a plan, redeeming a voucher and their payment history.', customerOpen: 'Open the customer portal', address: 'Address', username: 'Username', password: 'Password', copy: 'Copy', copied: 'Copied', noticeTitle: 'Shared demo', noticeText: 'Everyone uses the same demo, so what you see may have been changed by someone else, and it can be reset at any time. Do not enter real personal details or payment information.', install: 'Install your own copy' },
     download: { label: 'Download', latest: 'Latest release: {v}', notes: 'Release notes' },
     faq: {
       title: 'Questions people ask first',
@@ -68,6 +76,7 @@ export const pages: Record<Lang, Pages> = {
   },
   id: {
     demo: { hero: 'Coba demo langsung' },
+    demoPage: { title: 'Demo langsung', description: 'Coba panel admin dan portal pelanggan PHPNuxBill dengan akun siap pakai, tanpa memasang apa pun.', intro: 'Lihat PHPNuxBill bekerja sebelum Anda memasangnya. Ada dua sisi yang bisa dicoba: panel admin, tempat Anda menjalankan usaha, dan portal pelanggan, yang dilihat pelanggan Anda. Pilih salah satu, salin akunnya, lalu buka.', adminTitle: 'Panel admin', adminText: 'Untuk pengelola layanan: pelanggan, paket, router, voucher, pembayaran, dan laporan.', adminOpen: 'Buka panel admin', customerTitle: 'Portal pelanggan', customerText: 'Yang dilihat pelanggan: paket dan saldo mereka, membeli atau memperpanjang paket, menukar voucher, dan riwayat pembayaran.', customerOpen: 'Buka portal pelanggan', address: 'Alamat', username: 'Nama pengguna', password: 'Kata sandi', copy: 'Salin', copied: 'Tersalin', noticeTitle: 'Demo bersama', noticeText: 'Semua orang memakai demo yang sama, jadi yang Anda lihat mungkin sudah diubah orang lain, dan demo dapat direset kapan saja. Jangan memasukkan data pribadi atau informasi pembayaran yang sebenarnya.', install: 'Pasang salinan Anda sendiri' },
     download: { label: 'Unduh', latest: 'Rilis terbaru: {v}', notes: 'Catatan rilis' },
     faq: {
       title: 'Pertanyaan yang paling sering diajukan',
@@ -113,6 +122,7 @@ export const pages: Record<Lang, Pages> = {
   },
   es: {
     demo: { hero: 'Prueba la demo en vivo' },
+    demoPage: { title: 'Demo en vivo', description: 'Prueba el panel de administración y el portal de clientes de PHPNuxBill con un acceso ya preparado, sin instalar nada.', intro: 'Mira PHPNuxBill funcionando antes de instalarlo. Hay dos lados que probar: el panel de administración, desde donde diriges tu negocio, y el portal de clientes, que es lo que ven tus abonados. Elige uno, copia el acceso y ábrelo.', adminTitle: 'Panel de administración', adminText: 'Para quien dirige el servicio: clientes, planes, routers, vouchers, pagos e informes.', adminOpen: 'Abrir el panel de administración', customerTitle: 'Portal de clientes', customerText: 'Lo que ve un abonado: su plan y su saldo, comprar o renovar un plan, canjear un voucher y su historial de pagos.', customerOpen: 'Abrir el portal de clientes', address: 'Dirección', username: 'Usuario', password: 'Contraseña', copy: 'Copiar', copied: 'Copiado', noticeTitle: 'Demo compartida', noticeText: 'Todos usan la misma demo, así que lo que veas puede haber sido cambiado por otra persona, y puede restablecerse en cualquier momento. No introduzcas datos personales ni información de pago reales.', install: 'Instala tu propia copia' },
     download: { label: 'Descargar', latest: 'Última versión: {v}', notes: 'Notas de la versión' },
     faq: {
       title: 'Las preguntas que más se hacen',
@@ -158,6 +168,7 @@ export const pages: Record<Lang, Pages> = {
   },
   ar: {
     demo: { hero: 'جرّب العرض التجريبي المباشر' },
+    demoPage: { title: 'العرض التجريبي المباشر', description: 'جرّب لوحة الإدارة وبوابة العملاء في PHPNuxBill بحساب جاهز دون تثبيت أي شيء.', intro: 'شاهد PHPNuxBill وهو يعمل قبل تثبيته. هناك جانبان للتجربة: لوحة الإدارة التي تدير منها عملك، وبوابة العملاء التي يراها مشتركوك. اختر أحدهما، وانسخ بيانات الدخول ثم افتحه.', adminTitle: 'لوحة الإدارة', adminText: 'لمن يدير الخدمة: العملاء والباقات والموجّهات والقسائم والمدفوعات والتقارير.', adminOpen: 'افتح لوحة الإدارة', customerTitle: 'بوابة العملاء', customerText: 'ما يراه المشترك: باقته ورصيده، وشراء الباقة أو تجديدها، واستبدال القسيمة، وسجل مدفوعاته.', customerOpen: 'افتح بوابة العملاء', address: 'العنوان', username: 'اسم المستخدم', password: 'كلمة المرور', copy: 'نسخ', copied: 'تم النسخ', noticeTitle: 'عرض مشترك', noticeText: 'يستخدم الجميع العرض نفسه، لذلك قد يكون غيرك قد عدّل ما تراه، وقد تتم إعادة ضبطه في أي وقت. لا تُدخل بيانات شخصية أو معلومات دفع حقيقية.', install: 'ثبّت نسختك الخاصة' },
     download: { label: 'تنزيل', latest: 'آخر إصدار: {v}', notes: 'ملاحظات الإصدار' },
     faq: {
       title: 'الأسئلة التي تُطرح أولًا',
@@ -203,6 +214,7 @@ export const pages: Record<Lang, Pages> = {
   },
   tr: {
     demo: { hero: 'Canlı demoyu deneyin' },
+    demoPage: { title: 'Canlı demo', description: 'PHPNuxBill yönetim panelini ve müşteri portalını, hazır bir girişle, hiçbir şey kurmadan deneyin.', intro: 'PHPNuxBill’i kurmadan önce çalışırken görün. Denenecek iki taraf var: işinizi yönettiğiniz yönetim paneli ve abonelerinizin gördüğü müşteri portalı. Birini seçin, giriş bilgilerini kopyalayın ve açın.', adminTitle: 'Yönetim paneli', adminText: 'Hizmeti yönetenler için: müşteriler, paketler, yönlendiriciler, kuponlar, ödemeler ve raporlar.', adminOpen: 'Yönetim panelini aç', customerTitle: 'Müşteri portalı', customerText: 'Bir abonenin gördüğü: paketi ve bakiyesi, paket satın alma veya yenileme, kupon kullanma ve ödeme geçmişi.', customerOpen: 'Müşteri portalını aç', address: 'Adres', username: 'Kullanıcı adı', password: 'Parola', copy: 'Kopyala', copied: 'Kopyalandı', noticeTitle: 'Ortak demo', noticeText: 'Herkes aynı demoyu kullanır; gördüğünüz şeyi başkası değiştirmiş olabilir ve demo her an sıfırlanabilir. Gerçek kişisel bilgi veya ödeme bilgisi girmeyin.', install: 'Kendi kopyanızı kurun' },
     download: { label: 'İndir', latest: 'Son sürüm: {v}', notes: 'Sürüm notları' },
     faq: {
       title: 'İnsanların ilk sorduğu sorular',
