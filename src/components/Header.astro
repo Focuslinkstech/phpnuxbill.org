@@ -11,7 +11,7 @@ const current = LANGUAGES.find((l) => l.code === lang)!;
   <div class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
     <a href={localePath(lang, '/')} class="flex items-center gap-2 font-semibold">
       <img src={`${base}/favicon.png`} alt="" width="28" height="28" class="h-7 w-7" />
-      <span>PHPNuxBill</span>
+      <span class="hidden min-[400px]:inline">PHPNuxBill</span>
     </a>
     <nav class="ms-2 hidden items-center gap-5 text-sm text-muted-foreground sm:flex">
       <a href={localePath(lang, '/docs/')} class="hover:text-foreground">{t.nav.docs}</a>
