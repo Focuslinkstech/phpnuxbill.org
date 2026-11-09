@@ -1,4 +1,4 @@
-## 2026.10.25
+## 2026.8.25
 
 - Fixed: plugin menus registered with `admin = true` (e.g. Skeleton, My Plugin) showed in the customer portal sidebar whenever an admin session was open in the same browser; admin and customer menus are now kept apart (`_menu_publish()`, called by `_admin()` / `_auth()`)
 - Skeleton sample plugin now has both an admin and a customer menu with submenus (SVG icons); the plugin starter used slot names the templates never print (`DASHBOARD`, `ACCOUNTS`) and a submenu in a different slot than its parent, so its menus never showed - fixed, and the slot lists in the docs now match the templates
@@ -39,9 +39,9 @@
   - New `GatewayLoader` / `DeviceLoader`; gateway templates load by plain name or `pg:name.tpl`
   - Checkout, callback and payment-status code now resolve gateways through `GatewayLoader` (only installed gateways can be included)
 - Old `?_route=themes` page now redirects to Marketplace > Themes
-- Fixed: global `min-height:100%` rule collapsed marketplace cards; shadcn theme showed dark marketplace colours in light mode
+- Fixed: global `min-height:100%` rule collapsed marketplace cards; the marketplace showed dark colours in light mode in themes that remap its tokens
 
-## 2026.10.23
+## 2026.5.23
 
 - Plugin & Theme System overhaul (Phase 1-4)
   - Folder-based plugins with `plugin.json` manifest (`system/plugin/<slug>/`)
