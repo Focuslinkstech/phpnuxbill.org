@@ -90,7 +90,11 @@
 .prose :where(code):not(:where(pre code)) { background: var(--muted); border-radius: 0.35rem; padding: 0.1rem 0.35rem; font-weight: 500; font-size: 0.85em; }
 .prose :where(code):not(:where(pre code))::before, .prose :where(code):not(:where(pre code))::after { content: none; }
 .prose pre { background: var(--muted) !important; }
-.prose :where(table) { font-size: 0.875rem; }
+.prose { overflow-wrap: break-word; }
+/* wide tables scroll sideways inside the page instead of stretching it; long inline code may break */
+.prose :where(table) { font-size: 0.875rem; display: block; max-width: 100%; overflow-x: auto; }
+.prose :where(th, td) { min-width: 7rem; }
+.prose :where(code):not(:where(pre code)) { overflow-wrap: anywhere; }
 .prose :where(a) { text-underline-offset: 3px; }
 .prose :where(h2) { border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
 

@@ -8,7 +8,7 @@ const { title, description, section, current, headings = [], fallback = false, p
 const toc = headings.filter((h: { depth: number }) => h.depth === 2 || h.depth === 3);
 ---
 <Base title={title} description={description}>
-  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-8 lg:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[14rem_minmax(0,1fr)_13rem]">
+  <div class="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 px-4 py-8 lg:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[14rem_minmax(0,1fr)_13rem]">
     <aside class="lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto" data-pagefind-ignore>
       <details class="lg:hidden rounded-md border p-3">
         <summary class="cursor-pointer text-sm font-medium">{t.menu}</summary>
@@ -16,7 +16,7 @@ const toc = headings.filter((h: { depth: number }) => h.depth === 2 || h.depth =
       </details>
       <div class="hidden lg:block"><Sidebar current={current} /></div>
     </aside>
-    <article data-pagefind-body={fallback ? undefined : ''} data-pagefind-ignore={fallback ? '' : undefined}>
+    <article class="min-w-0" data-pagefind-body={fallback ? undefined : ''} data-pagefind-ignore={fallback ? '' : undefined}>
       <p class="text-sm text-muted-foreground">{section}</p>
       <h1 class="mt-1 text-3xl font-bold tracking-tight" data-pagefind-meta="title">{title}</h1>
       {description && <p class="mt-2 text-lg text-muted-foreground">{description}</p>}
